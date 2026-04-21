@@ -1,0 +1,163 @@
+:root {
+  --bg-1: #f7f3ec;
+  --bg-2: #f2eadb;
+  --ink: #1c2321;
+  --muted: #4f5a57;
+  --card: rgba(255, 255, 255, 0.72);
+  --line: rgba(28, 35, 33, 0.12);
+  --human: #f05d23;
+  --ai: #1f7a8c;
+  --savings: #2a9d8f;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Space Grotesk", sans-serif;
+  color: var(--ink);
+  background: radial-gradient(circle at 5% 10%, #ffe8cc 0%, transparent 40%),
+    radial-gradient(circle at 95% 90%, #d6f5f2 0%, transparent 36%),
+    linear-gradient(140deg, var(--bg-1), var(--bg-2));
+  min-height: 100vh;
+}
+
+.page-glow {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(120deg, rgba(255, 255, 255, 0.2), transparent 60%);
+}
+
+.app {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 32px 16px 40px;
+  display: grid;
+  gap: 18px;
+}
+
+.hero h1 {
+  margin: 6px 0 10px;
+  font-size: clamp(1.8rem, 5vw, 2.8rem);
+}
+
+.hero p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.eyebrow {
+  font-family: "IBM Plex Mono", monospace;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: 0.72rem;
+}
+
+.card {
+  border: 1px solid var(--line);
+  background: var(--card);
+  backdrop-filter: blur(7px);
+  border-radius: 16px;
+  padding: 16px;
+}
+
+.input-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 12px;
+}
+
+label {
+  display: grid;
+  gap: 8px;
+  font-size: 0.92rem;
+}
+
+input {
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  padding: 10px 12px;
+  font: inherit;
+}
+
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+}
+
+.metrics h2,
+.analytics h2 {
+  margin: 0 0 10px;
+  font-size: 0.96rem;
+}
+
+.metric {
+  margin: 0;
+  font-weight: 700;
+  font-size: 1.5rem;
+}
+
+.positive {
+  color: var(--savings);
+}
+
+.negative {
+  color: #c1121f;
+}
+
+.bars {
+  display: grid;
+  gap: 12px;
+}
+
+.bars span {
+  display: inline-block;
+  font-size: 0.9rem;
+  margin-bottom: 4px;
+}
+
+.bar-track {
+  width: 100%;
+  height: 14px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.08);
+}
+
+.bar {
+  height: 100%;
+  width: 0;
+  transition: width 300ms ease;
+}
+
+.human {
+  background: var(--human);
+}
+
+.ai {
+  background: var(--ai);
+}
+
+.savings {
+  background: var(--savings);
+}
+
+.insight {
+  margin: 12px 0 2px;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+@media (max-width: 640px) {
+  .app {
+    padding-top: 22px;
+  }
+
+  .card {
+    border-radius: 14px;
+  }
+}

@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI Cost Calculator</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="page-glow" aria-hidden="true"></div>
+    <main class="app">
+      <header class="hero">
+        <p class="eyebrow">Decision Tool</p>
+        <h1>AI Cost vs Human Operations</h1>
+        <p>
+          Compare monthly operating cost, projected savings, and productivity lift with
+          transparent assumptions.
+        </p>
+      </header>
+
+      <section class="card input-grid" aria-label="Input controls">
+        <label>
+          Team Size
+          <input id="teamSize" type="number" min="1" value="5" />
+        </label>
+        <label>
+          Avg Salary Per Person (USD)
+          <input id="salary" type="number" min="0" value="7000" step="100" />
+        </label>
+        <label>
+          Monthly AI Platform Cost (USD)
+          <input id="aiCost" type="number" min="0" value="1800" step="50" />
+        </label>
+        <label>
+          Productivity Lift from AI (%)
+          <input id="lift" type="number" min="0" max="100" value="35" step="1" />
+        </label>
+      </section>
+
+      <section class="card metrics" aria-label="Key results">
+        <article>
+          <h2>Human Monthly Cost</h2>
+          <p id="humanMonthly" class="metric">$0</p>
+        </article>
+        <article>
+          <h2>AI Monthly Cost</h2>
+          <p id="aiMonthly" class="metric">$0</p>
+        </article>
+        <article>
+          <h2>Estimated Monthly Savings</h2>
+          <p id="savingsMonthly" class="metric positive">$0</p>
+        </article>
+        <article>
+          <h2>Adjusted Team Output</h2>
+          <p id="productivity" class="metric">0%</p>
+        </article>
+      </section>
+
+      <section class="card analytics" aria-label="Analytics section">
+        <h2>Analytics</h2>
+        <div class="bars">
+          <div>
+            <span>Human Cost</span>
+            <div class="bar-track"><div id="humanBar" class="bar human"></div></div>
+          </div>
+          <div>
+            <span>AI Cost</span>
+            <div class="bar-track"><div id="aiBar" class="bar ai"></div></div>
+          </div>
+          <div>
+            <span>Savings</span>
+            <div class="bar-track"><div id="savingsBar" class="bar savings"></div></div>
+          </div>
+        </div>
+        <p id="insight" class="insight"></p>
+      </section>
+    </main>
+
+    <script src="script.js"></script>
+  </body>
+</html>
