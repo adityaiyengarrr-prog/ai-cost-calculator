@@ -59,6 +59,34 @@ body {
   font-size: 0.9rem;
 }
 
+.hero-kpis {
+  margin: 14px 0 0;
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+}
+
+.hero-kpis article {
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  background: #f8fafc;
+  padding: 10px;
+}
+
+.kpi-label {
+  margin: 0;
+  font: 500 0.72rem/1 "JetBrains Mono", monospace;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.kpi-value {
+  margin: 6px 0 0;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
 .eyebrow {
   margin: 0;
   font: 500 0.76rem/1 "JetBrains Mono", monospace;

@@ -25,6 +25,20 @@
           Model fully loaded employee cost against AI stack spend and implementation effort.
           Get annual delta, payback period, and break-even month in seconds.
         </p>
+        <div class="hero-kpis">
+          <article>
+            <p class="kpi-label">Decision Speed</p>
+            <p class="kpi-value">Under 2 Minutes</p>
+          </article>
+          <article>
+            <p class="kpi-label">View Mode</p>
+            <p class="kpi-value">Base + Range</p>
+          </article>
+          <article>
+            <p class="kpi-label">Output Focus</p>
+            <p class="kpi-value">Savings + Payback</p>
+          </article>
+        </div>
         <p class="hero-mini">
           Includes conservative, base, and upside scenarios so finance teams can evaluate
           uncertainty before committing budget.
@@ -114,8 +128,23 @@
           <p id="breakEven" class="metric">Month 0</p>
         </article>
         <article>
+          <h3>Year-1 ROI</h3>
+          <p id="roi" class="metric">0%</p>
+        </article>
+        <article>
           <h3>Effective Capacity Gain</h3>
           <p id="capacity" class="metric">0%</p>
+        </article>
+      </section>
+
+      <section class="card metrics" aria-label="Board-level impact">
+        <article>
+          <h3>Monthly Net Savings</h3>
+          <p id="monthlySavings" class="metric">$0</p>
+        </article>
+        <article>
+          <h3>3-Year Net Benefit</h3>
+          <p id="threeYearBenefit" class="metric">$0</p>
         </article>
       </section>
 
@@ -160,6 +189,7 @@
           <li>AI cost includes platform + usage + human-in-the-loop + one-time implementation.</li>
           <li>Residual labor is the non-automated workload adjusted by productivity lift and rework.</li>
           <li>Scenario range adjusts automation, rework, and AI usage to reflect uncertainty.</li>
+          <li>Year-1 ROI is calculated as annual net savings divided by total Year-1 AI program cost.</li>
         </ul>
       </section>
 
@@ -221,7 +251,10 @@
           Use these outputs to prepare a board-ready decision memo with best-case and base-case
           assumptions.
         </p>
-        <a href="#" aria-label="Book ROI review">Book ROI Review</a>
+        <a href="#insight" aria-label="Review AI ROI summary">Review ROI Summary</a>
+        <a class="secondary-link" href="#teamSize" aria-label="Jump to calculator inputs">
+          Adjust Inputs
+        </a>
         <a class="secondary-link" href="#" aria-label="Download CFO memo template">
           Download CFO Memo Template
         </a>

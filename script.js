@@ -19,7 +19,10 @@ const outputs = {
   annualSavings: document.getElementById("annualSavings"),
   payback: document.getElementById("payback"),
   breakEven: document.getElementById("breakEven"),
+  roi: document.getElementById("roi"),
   capacity: document.getElementById("capacity"),
+  monthlySavings: document.getElementById("monthlySavings"),
+  threeYearBenefit: document.getElementById("threeYearBenefit"),
   conservativeSavings: document.getElementById("conservativeSavings"),
   baseSavings: document.getElementById("baseSavings"),
   upsideSavings: document.getElementById("upsideSavings"),
@@ -179,6 +182,8 @@ function update() {
     base.fullyLoadedMonthlyLabor - (base.monthlyAiProgram + base.adjustedAiEquivalentLaborCost);
   const paybackMonths = monthlySavings > 0 ? implementation / monthlySavings : null;
   const breakEvenMonths = paybackMonths !== null ? Math.ceil(paybackMonths) : null;
+  const yearOneRoi = aiProgramWithResidualLabor > 0 ? (annualSavings / aiProgramWithResidualLabor) * 100 : 0;
+  const threeYearBenefit = annualSavings * 3;
 
   const conservative = calculateAnnualSavings({
     teamSize,
@@ -215,7 +220,14 @@ function update() {
   outputs.annualSavings.textContent = money(annualSavings);
   outputs.payback.textContent = paybackMonths !== null ? `${paybackMonths.toFixed(1)} months` : "No payback";
   outputs.breakEven.textContent = breakEvenMonths !== null ? `Month ${breakEvenMonths}` : "Not reached";
+  outputs.roi.textContent = `${yearOneRoi.toFixed(0)}%`;
   outputs.capacity.textContent = `${Math.max(0, effectiveHumanCapacityGain).toFixed(0)}%`;
+  outputs.monthlySavings.textContent = money(monthlySavings);
+  outputs.monthlySavings.classList.toggle("positive", monthlySavings >= 0);
+  outputs.monthlySavings.classList.toggle("negative", monthlySavings < 0);
+  outputs.threeYearBenefit.textContent = money(threeYearBenefit);
+  outputs.threeYearBenefit.classList.toggle("positive", threeYearBenefit >= 0);
+  outputs.threeYearBenefit.classList.toggle("negative", threeYearBenefit < 0);
   outputs.conservativeSavings.textContent = money(conservative.annualSavings);
   outputs.baseSavings.textContent = money(annualSavings);
   outputs.upsideSavings.textContent = money(upside.annualSavings);
@@ -229,9 +241,9 @@ function update() {
   outputs.savingsBar.style.width = `${(Math.abs(annualSavings) / max) * 100}%`;
 
   if (annualSavings >= 0) {
-    outputs.insight.textContent = `AI-led delivery saves ${money(annualSavings)} annually with break-even ${outputs.breakEven.textContent.toLowerCase()} under current assumptions.`;
+    outputs.insight.textContent = `AI-led delivery saves ${money(annualSavings)} annually (${money(monthlySavings)} per month), reaches break-even ${outputs.breakEven.textContent.toLowerCase()}, and delivers ${yearOneRoi.toFixed(0)}% Year-1 ROI.`;
   } else {
-    outputs.insight.textContent = `Current assumptions show a ${money(Math.abs(annualSavings))} annual gap. Improve automation suitability, reduce rework, or lower AI stack costs.`;
+    outputs.insight.textContent = `Current assumptions show a ${money(Math.abs(annualSavings))} annual gap. Improve automation suitability, reduce rework, or lower AI stack costs before rollout.`;
   }
 }
 
