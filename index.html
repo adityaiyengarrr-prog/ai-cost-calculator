@@ -111,6 +111,18 @@
             Avg Handling Time Per Task (minutes)
             <input id="minutesPerTask" type="number" min="0.1" value="6" step="0.1" />
           </label>
+          <label>
+            Geography Cost Multiplier (%)
+            <input id="geoMultiplier" type="number" min="50" max="250" value="100" step="1" />
+          </label>
+          <label>
+            AI Maintenance Hours / Month
+            <input id="maintenanceHours" type="number" min="0" value="24" step="1" />
+          </label>
+          <label>
+            Blended AI Ops Rate (USD/hr)
+            <input id="maintenanceRate" type="number" min="0" value="95" step="1" />
+          </label>
         </div>
       </section>
 
@@ -161,6 +173,10 @@
         <article>
           <h3>AI Cost Per Minute</h3>
           <p id="aiCostPerMinute" class="metric">$0</p>
+        </article>
+        <article>
+          <h3>Year-2 Annual Savings</h3>
+          <p id="yearTwoSavings" class="metric">$0</p>
         </article>
       </section>
 
@@ -228,12 +244,22 @@
         <p id="insight" class="insight"></p>
       </section>
 
+      <section class="card decision-card" aria-label="Executive recommendation">
+        <h2>Executive Recommendation</h2>
+        <p id="recommendationHeadline" class="recommendation-headline">Run the base scenario.</p>
+        <p id="recommendationBody" class="recommendation-body">
+          This section summarizes the financial case and suggested next step.
+        </p>
+      </section>
+
       <section class="card assumptions">
         <h2>Assumptions & Methodology</h2>
         <ul>
           <li>Employee TCO includes salary, burden, attrition, and management/QA overhead.</li>
           <li>AI cost includes platform + usage + human-in-the-loop + one-time implementation.</li>
           <li>Residual labor is the non-automated workload adjusted by productivity lift and rework.</li>
+          <li>Geography multiplier adjusts salary baseline for local market differences.</li>
+          <li>AI maintenance hours add recurring ops and optimization effort.</li>
           <li>Scenario range adjusts automation, rework, and AI usage to reflect uncertainty.</li>
           <li>Year-1 ROI is calculated as annual net savings divided by total Year-1 AI program cost.</li>
           <li>Confidence score increases when payback is fast and downside scenario remains positive.</li>

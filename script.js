@@ -13,6 +13,9 @@ const fields = {
   rework: document.getElementById("rework"),
   monthlyVolume: document.getElementById("monthlyVolume"),
   minutesPerTask: document.getElementById("minutesPerTask"),
+  geoMultiplier: document.getElementById("geoMultiplier"),
+  maintenanceHours: document.getElementById("maintenanceHours"),
+  maintenanceRate: document.getElementById("maintenanceRate"),
 };
 
 const outputs = {
@@ -36,6 +39,9 @@ const outputs = {
   humanCostPerTask: document.getElementById("humanCostPerTask"),
   aiCostPerTask: document.getElementById("aiCostPerTask"),
   aiCostPerMinute: document.getElementById("aiCostPerMinute"),
+  yearTwoSavings: document.getElementById("yearTwoSavings"),
+  recommendationHeadline: document.getElementById("recommendationHeadline"),
+  recommendationBody: document.getElementById("recommendationBody"),
   employeeBar: document.getElementById("employeeBar"),
   aiBar: document.getElementById("aiBar"),
   savingsBar: document.getElementById("savingsBar"),
@@ -58,6 +64,9 @@ const presets = {
     rework: 10,
     monthlyVolume: 42000,
     minutesPerTask: 7,
+    geoMultiplier: 100,
+    maintenanceHours: 30,
+    maintenanceRate: 95,
   },
   sdr: {
     teamSize: 8,
@@ -74,6 +83,9 @@ const presets = {
     rework: 8,
     monthlyVolume: 16000,
     minutesPerTask: 5,
+    geoMultiplier: 102,
+    maintenanceHours: 20,
+    maintenanceRate: 95,
   },
   backoffice: {
     teamSize: 10,
@@ -90,6 +102,9 @@ const presets = {
     rework: 7,
     monthlyVolume: 22000,
     minutesPerTask: 6.5,
+    geoMultiplier: 98,
+    maintenanceHours: 24,
+    maintenanceRate: 90,
   },
   content: {
     teamSize: 6,
@@ -106,6 +121,9 @@ const presets = {
     rework: 11,
     monthlyVolume: 12000,
     minutesPerTask: 8,
+    geoMultiplier: 96,
+    maintenanceHours: 18,
+    maintenanceRate: 85,
   },
 };
 
@@ -136,12 +154,13 @@ function clamp(value, min, max) {
 }
 
 function calculateAnnualSavings(inputs) {
-  const baseMonthlyLabor = inputs.teamSize * inputs.salary;
+  const baseMonthlyLabor = inputs.teamSize * inputs.salary * inputs.geoMultiplier;
   const fullyLoadedMonthlyLabor =
     baseMonthlyLabor * (1 + inputs.burden + inputs.attrition + inputs.management);
   const annualEmployeeTco = fullyLoadedMonthlyLabor * 12;
 
-  const monthlyAiProgram = inputs.aiPlatform + inputs.aiUsage + inputs.hitl;
+  const monthlyAiProgram =
+    inputs.aiPlatform + inputs.aiUsage + inputs.hitl + inputs.maintenanceHours * inputs.maintenanceRate;
   const annualAiProgram = monthlyAiProgram * 12 + inputs.implementation;
 
   const residualWorkFactor = 1 - inputs.automation;
@@ -163,12 +182,28 @@ function calculateAnnualSavings(inputs) {
 }
 
 function requiredAutomationForBreakEven(inputs) {
-  const { teamSize, salary, burden, attrition, management, aiPlatform, aiUsage, hitl, implementation, lift, rework } = inputs;
-  const baseMonthlyLabor = teamSize * salary;
+  const {
+    teamSize,
+    salary,
+    burden,
+    attrition,
+    management,
+    aiPlatform,
+    aiUsage,
+    hitl,
+    implementation,
+    lift,
+    rework,
+    geoMultiplier,
+    maintenanceHours,
+    maintenanceRate,
+  } = inputs;
+  const baseMonthlyLabor = teamSize * salary * geoMultiplier;
   const fullyLoadedMonthlyLabor =
     baseMonthlyLabor * (1 + burden + attrition + management);
   const annualEmployeeTco = fullyLoadedMonthlyLabor * 12;
-  const annualAiBase = (aiPlatform + aiUsage + hitl) * 12 + implementation;
+  const annualAiBase =
+    (aiPlatform + aiUsage + hitl + maintenanceHours * maintenanceRate) * 12 + implementation;
   const laborCostWithoutAutomation =
     (fullyLoadedMonthlyLabor * (1 + rework) * 12) / (1 + lift);
 
@@ -206,6 +241,9 @@ function update() {
   const rework = clamp(safeNumber(fields.rework.value) / 100, 0, 1);
   const monthlyVolume = Math.max(1, safeNumber(fields.monthlyVolume.value, 1));
   const minutesPerTask = Math.max(0.1, safeNumber(fields.minutesPerTask.value, 0.1));
+  const geoMultiplier = clamp(safeNumber(fields.geoMultiplier.value) / 100, 0.5, 2.5);
+  const maintenanceHours = Math.max(0, safeNumber(fields.maintenanceHours.value));
+  const maintenanceRate = Math.max(0, safeNumber(fields.maintenanceRate.value));
 
   const effectiveHumanCapacityGain = (automation + (1 - automation) * lift) * (1 - rework) * 100;
 
@@ -222,6 +260,9 @@ function update() {
     automation,
     lift,
     rework,
+    geoMultiplier,
+    maintenanceHours,
+    maintenanceRate,
   });
 
   const annualEmployeeTco = base.annualEmployeeTco;
@@ -234,6 +275,7 @@ function update() {
   const breakEvenMonths = paybackMonths !== null ? Math.ceil(paybackMonths) : null;
   const yearOneRoi = aiProgramWithResidualLabor > 0 ? (annualSavings / aiProgramWithResidualLabor) * 100 : 0;
   const threeYearBenefit = annualSavings * 3;
+  const yearTwoSavings = annualEmployeeTco - (aiProgramWithResidualLabor - implementation);
 
   const conservative = calculateAnnualSavings({
     teamSize,
@@ -248,6 +290,9 @@ function update() {
     automation: clamp(automation * 0.85, 0, 1),
     lift: clamp(lift * 0.9, 0, 1),
     rework: clamp(rework * 1.25, 0, 1),
+    geoMultiplier,
+    maintenanceHours,
+    maintenanceRate,
   });
 
   const upside = calculateAnnualSavings({
@@ -263,6 +308,9 @@ function update() {
     automation: clamp(automation * 1.1, 0, 1),
     lift: clamp(lift * 1.15, 0, 1),
     rework: clamp(rework * 0.8, 0, 1),
+    geoMultiplier,
+    maintenanceHours,
+    maintenanceRate,
   });
 
   const maxAffordableAiMonthly =
@@ -285,6 +333,9 @@ function update() {
     implementation,
     lift,
     rework,
+    geoMultiplier,
+    maintenanceHours,
+    maintenanceRate,
   });
 
   let confidenceScore = 55;
@@ -327,6 +378,7 @@ function update() {
   outputs.humanCostPerTask.textContent = moneyPrecise(humanCostPerTask);
   outputs.aiCostPerTask.textContent = moneyPrecise(aiCostPerTask);
   outputs.aiCostPerMinute.textContent = moneyPrecise(aiCostPerMinute);
+  outputs.yearTwoSavings.textContent = money(yearTwoSavings);
 
   outputs.annualSavings.classList.toggle("positive", annualSavings >= 0);
   outputs.annualSavings.classList.toggle("negative", annualSavings < 0);
@@ -346,6 +398,20 @@ function update() {
     outputs.insight.textContent = `AI-led delivery saves ${money(annualSavings)} annually (${money(monthlySavings)} per month), reaches break-even ${outputs.breakEven.textContent.toLowerCase()}, and delivers ${yearOneRoi.toFixed(0)}% Year-1 ROI. Unit economics improve from ${moneyPrecise(humanCostPerTask)} to ${moneyPrecise(aiCostPerTask)} per task with AI cost around ${moneyPrecise(aiCostPerMinute)} per minute. Confidence score: ${confidenceScore.toFixed(0)}/100.`;
   } else {
     outputs.insight.textContent = `Current assumptions show a ${money(Math.abs(annualSavings))} annual gap. Improve automation suitability to at least ${outputs.requiredAutomation.textContent}, reduce rework, or lower AI stack costs before rollout.`;
+  }
+
+  if (annualSavings > 0 && paybackMonths !== null && paybackMonths <= 12) {
+    outputs.recommendationHeadline.textContent = "Proceed with phased rollout.";
+    outputs.recommendationBody.textContent =
+      `Base case indicates ${money(annualSavings)} Year-1 savings and ${money(yearTwoSavings)} recurring annual savings after implementation costs roll off. Prioritize one department preset and run a 90-day pilot with weekly QA tracking.`;
+  } else if (annualSavings > 0) {
+    outputs.recommendationHeadline.textContent = "Proceed with pilot before full rollout.";
+    outputs.recommendationBody.textContent =
+      "The model is positive but payback extends beyond one year. Tighten AI usage costs and improve automation suitability to reduce time-to-value before broad deployment.";
+  } else {
+    outputs.recommendationHeadline.textContent = "Do not scale yet.";
+    outputs.recommendationBody.textContent =
+      "Current assumptions do not support an immediate rollout. Re-baseline vendor costs, reduce quality penalty, and target higher-volume workflows before budget approval.";
   }
 }
 

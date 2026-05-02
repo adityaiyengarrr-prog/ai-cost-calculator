@@ -209,6 +209,24 @@ input {
   color: var(--muted);
 }
 
+.decision-card {
+  border-color: #99f6e4;
+  background: linear-gradient(180deg, #f0fdfa 0%, #ffffff 100%);
+}
+
+.recommendation-headline {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.recommendation-body {
+  margin: 8px 0 0;
+  color: var(--muted);
+  max-width: 860px;
+}
+
 .section-grid {
   display: grid;
   gap: 14px;
