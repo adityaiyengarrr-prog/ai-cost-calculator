@@ -11,6 +11,8 @@ const fields = {
   automation: document.getElementById("automation"),
   lift: document.getElementById("lift"),
   rework: document.getElementById("rework"),
+  monthlyVolume: document.getElementById("monthlyVolume"),
+  minutesPerTask: document.getElementById("minutesPerTask"),
 };
 
 const outputs = {
@@ -30,6 +32,10 @@ const outputs = {
   requiredAutomation: document.getElementById("requiredAutomation"),
   maxAiMonthly: document.getElementById("maxAiMonthly"),
   riskFlag: document.getElementById("riskFlag"),
+  breakEvenVolume: document.getElementById("breakEvenVolume"),
+  humanCostPerTask: document.getElementById("humanCostPerTask"),
+  aiCostPerTask: document.getElementById("aiCostPerTask"),
+  aiCostPerMinute: document.getElementById("aiCostPerMinute"),
   employeeBar: document.getElementById("employeeBar"),
   aiBar: document.getElementById("aiBar"),
   savingsBar: document.getElementById("savingsBar"),
@@ -50,6 +56,8 @@ const presets = {
     automation: 68,
     lift: 26,
     rework: 10,
+    monthlyVolume: 42000,
+    minutesPerTask: 7,
   },
   sdr: {
     teamSize: 8,
@@ -64,6 +72,8 @@ const presets = {
     automation: 55,
     lift: 30,
     rework: 8,
+    monthlyVolume: 16000,
+    minutesPerTask: 5,
   },
   backoffice: {
     teamSize: 10,
@@ -78,6 +88,8 @@ const presets = {
     automation: 60,
     lift: 24,
     rework: 7,
+    monthlyVolume: 22000,
+    minutesPerTask: 6.5,
   },
   content: {
     teamSize: 6,
@@ -92,6 +104,8 @@ const presets = {
     automation: 52,
     lift: 34,
     rework: 11,
+    monthlyVolume: 12000,
+    minutesPerTask: 8,
   },
 };
 
@@ -105,6 +119,15 @@ function money(value) {
     style: "currency",
     currency: "USD",
     maximumFractionDigits: 0,
+  }).format(value);
+}
+
+function moneyPrecise(value) {
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
   }).format(value);
 }
 
@@ -181,6 +204,8 @@ function update() {
   const automation = clamp(safeNumber(fields.automation.value) / 100, 0, 1);
   const lift = clamp(safeNumber(fields.lift.value) / 100, 0, 1);
   const rework = clamp(safeNumber(fields.rework.value) / 100, 0, 1);
+  const monthlyVolume = Math.max(1, safeNumber(fields.monthlyVolume.value, 1));
+  const minutesPerTask = Math.max(0.1, safeNumber(fields.minutesPerTask.value, 0.1));
 
   const effectiveHumanCapacityGain = (automation + (1 - automation) * lift) * (1 - rework) * 100;
 
@@ -242,6 +267,12 @@ function update() {
 
   const maxAffordableAiMonthly =
     base.fullyLoadedMonthlyLabor - base.adjustedAiEquivalentLaborCost + implementation / 12;
+  const humanCostPerTask = base.fullyLoadedMonthlyLabor / monthlyVolume;
+  const aiCostPerTask =
+    (base.monthlyAiProgram + base.adjustedAiEquivalentLaborCost) / monthlyVolume;
+  const aiCostPerMinute = aiCostPerTask / minutesPerTask;
+  const breakEvenVolume =
+    humanCostPerTask > aiCostPerTask ? implementation / (humanCostPerTask - aiCostPerTask) : null;
   const requiredAutomation = requiredAutomationForBreakEven({
     teamSize,
     salary,
@@ -291,6 +322,11 @@ function update() {
   outputs.requiredAutomation.textContent = `${(requiredAutomation * 100).toFixed(0)}%`;
   outputs.maxAiMonthly.textContent = money(Math.max(0, maxAffordableAiMonthly));
   outputs.riskFlag.textContent = riskFlag;
+  outputs.breakEvenVolume.textContent =
+    breakEvenVolume !== null ? `${Math.ceil(breakEvenVolume).toLocaleString("en-US")}` : "Not reached";
+  outputs.humanCostPerTask.textContent = moneyPrecise(humanCostPerTask);
+  outputs.aiCostPerTask.textContent = moneyPrecise(aiCostPerTask);
+  outputs.aiCostPerMinute.textContent = moneyPrecise(aiCostPerMinute);
 
   outputs.annualSavings.classList.toggle("positive", annualSavings >= 0);
   outputs.annualSavings.classList.toggle("negative", annualSavings < 0);
@@ -307,7 +343,7 @@ function update() {
   outputs.savingsBar.style.width = `${(Math.abs(annualSavings) / max) * 100}%`;
 
   if (annualSavings >= 0) {
-    outputs.insight.textContent = `AI-led delivery saves ${money(annualSavings)} annually (${money(monthlySavings)} per month), reaches break-even ${outputs.breakEven.textContent.toLowerCase()}, and delivers ${yearOneRoi.toFixed(0)}% Year-1 ROI. Confidence score: ${confidenceScore.toFixed(0)}/100.`;
+    outputs.insight.textContent = `AI-led delivery saves ${money(annualSavings)} annually (${money(monthlySavings)} per month), reaches break-even ${outputs.breakEven.textContent.toLowerCase()}, and delivers ${yearOneRoi.toFixed(0)}% Year-1 ROI. Unit economics improve from ${moneyPrecise(humanCostPerTask)} to ${moneyPrecise(aiCostPerTask)} per task with AI cost around ${moneyPrecise(aiCostPerMinute)} per minute. Confidence score: ${confidenceScore.toFixed(0)}/100.`;
   } else {
     outputs.insight.textContent = `Current assumptions show a ${money(Math.abs(annualSavings))} annual gap. Improve automation suitability to at least ${outputs.requiredAutomation.textContent}, reduce rework, or lower AI stack costs before rollout.`;
   }

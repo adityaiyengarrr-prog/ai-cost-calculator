@@ -103,6 +103,14 @@
             Rework / Error Rate Penalty (%)
             <input id="rework" type="number" min="0" max="100" value="8" step="1" />
           </label>
+          <label>
+            Monthly Task Volume
+            <input id="monthlyVolume" type="number" min="1" value="24000" step="100" />
+          </label>
+          <label>
+            Avg Handling Time Per Task (minutes)
+            <input id="minutesPerTask" type="number" min="0.1" value="6" step="0.1" />
+          </label>
         </div>
       </section>
 
@@ -150,6 +158,10 @@
           <h3>Confidence Score</h3>
           <p id="confidenceScore" class="metric">0/100</p>
         </article>
+        <article>
+          <h3>AI Cost Per Minute</h3>
+          <p id="aiCostPerMinute" class="metric">$0</p>
+        </article>
       </section>
 
       <section class="card metrics scenario-band" aria-label="Scenario range">
@@ -179,6 +191,21 @@
         <article>
           <h3>Risk Flag</h3>
           <p id="riskFlag" class="metric">Stable</p>
+        </article>
+        <article>
+          <h3>Break-even Volume (Tasks/Month)</h3>
+          <p id="breakEvenVolume" class="metric">0</p>
+        </article>
+      </section>
+
+      <section class="card metrics" aria-label="Unit economics">
+        <article>
+          <h3>Human Cost Per Task</h3>
+          <p id="humanCostPerTask" class="metric">$0</p>
+        </article>
+        <article>
+          <h3>AI Program Cost Per Task</h3>
+          <p id="aiCostPerTask" class="metric">$0</p>
         </article>
       </section>
 
@@ -229,6 +256,15 @@
             <li>Sales development outbound personalization</li>
             <li>Back-office document and workflow processing</li>
             <li>Content drafting and repurposing</li>
+          </ul>
+        </article>
+        <article>
+          <h2>Why This Calculator Outperforms Generic Tools</h2>
+          <ul>
+            <li>Includes fully loaded labor components beyond base salary.</li>
+            <li>Separates AI platform, usage, and human-in-the-loop cost centers.</li>
+            <li>Shows downside/base/upside ranges for planning confidence.</li>
+            <li>Adds unit economics to connect ROI to real operational volume.</li>
           </ul>
         </article>
       </section>
