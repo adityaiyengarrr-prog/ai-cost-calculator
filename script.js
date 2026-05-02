@@ -20,6 +20,9 @@ const outputs = {
   payback: document.getElementById("payback"),
   breakEven: document.getElementById("breakEven"),
   capacity: document.getElementById("capacity"),
+  conservativeSavings: document.getElementById("conservativeSavings"),
+  baseSavings: document.getElementById("baseSavings"),
+  upsideSavings: document.getElementById("upsideSavings"),
   employeeBar: document.getElementById("employeeBar"),
   aiBar: document.getElementById("aiBar"),
   savingsBar: document.getElementById("savingsBar"),
@@ -102,6 +105,33 @@ function clamp(value, min, max) {
   return Math.max(min, Math.min(max, value));
 }
 
+function calculateAnnualSavings(inputs) {
+  const baseMonthlyLabor = inputs.teamSize * inputs.salary;
+  const fullyLoadedMonthlyLabor =
+    baseMonthlyLabor * (1 + inputs.burden + inputs.attrition + inputs.management);
+  const annualEmployeeTco = fullyLoadedMonthlyLabor * 12;
+
+  const monthlyAiProgram = inputs.aiPlatform + inputs.aiUsage + inputs.hitl;
+  const annualAiProgram = monthlyAiProgram * 12 + inputs.implementation;
+
+  const residualWorkFactor = 1 - inputs.automation;
+  const qualityPenaltyFactor = 1 + inputs.rework;
+  const productivityFactor = 1 + inputs.lift;
+
+  const adjustedAiEquivalentLaborCost =
+    (fullyLoadedMonthlyLabor * residualWorkFactor * qualityPenaltyFactor) / productivityFactor;
+  const aiProgramWithResidualLabor = annualAiProgram + adjustedAiEquivalentLaborCost * 12;
+
+  return {
+    annualEmployeeTco,
+    aiProgramWithResidualLabor,
+    annualSavings: annualEmployeeTco - aiProgramWithResidualLabor,
+    monthlyAiProgram,
+    fullyLoadedMonthlyLabor,
+    adjustedAiEquivalentLaborCost,
+  };
+}
+
 function assignPreset(name) {
   const preset = presets[name];
   if (!preset) return;
@@ -126,29 +156,59 @@ function update() {
   const automation = clamp(safeNumber(fields.automation.value) / 100, 0, 1);
   const lift = clamp(safeNumber(fields.lift.value) / 100, 0, 1);
   const rework = clamp(safeNumber(fields.rework.value) / 100, 0, 1);
+  const effectiveHumanCapacityGain = (automation + (1 - automation) * lift) * (1 - rework) * 100;
+  const base = calculateAnnualSavings({
+    teamSize,
+    salary,
+    burden,
+    attrition,
+    management,
+    aiPlatform,
+    aiUsage,
+    hitl,
+    implementation,
+    automation,
+    lift,
+    rework,
+  });
+  const annualEmployeeTco = base.annualEmployeeTco;
+  const aiProgramWithResidualLabor = base.aiProgramWithResidualLabor;
+  const annualSavings = base.annualSavings;
 
-  const baseMonthlyLabor = teamSize * salary;
-  const fullyLoadedMonthlyLabor = baseMonthlyLabor * (1 + burden + attrition + management);
-  const annualEmployeeTco = fullyLoadedMonthlyLabor * 12;
-
-  const monthlyAiProgram = aiPlatform + aiUsage + hitl;
-  const annualAiProgram = monthlyAiProgram * 12 + implementation;
-
-  const residualWorkFactor = 1 - automation;
-  const qualityPenaltyFactor = 1 + rework;
-  const productivityFactor = 1 + lift;
-
-  const effectiveHumanCapacityGain = ((automation + residualWorkFactor * lift) * (1 - rework)) * 100;
-
-  const adjustedAiEquivalentLaborCost =
-    fullyLoadedMonthlyLabor * residualWorkFactor * qualityPenaltyFactor / productivityFactor;
-
-  const aiProgramWithResidualLabor = annualAiProgram + adjustedAiEquivalentLaborCost * 12;
-  const annualSavings = annualEmployeeTco - aiProgramWithResidualLabor;
-
-  const monthlySavings = fullyLoadedMonthlyLabor - (monthlyAiProgram + adjustedAiEquivalentLaborCost);
+  const monthlySavings =
+    base.fullyLoadedMonthlyLabor - (base.monthlyAiProgram + base.adjustedAiEquivalentLaborCost);
   const paybackMonths = monthlySavings > 0 ? implementation / monthlySavings : null;
   const breakEvenMonths = paybackMonths !== null ? Math.ceil(paybackMonths) : null;
+
+  const conservative = calculateAnnualSavings({
+    teamSize,
+    salary,
+    burden,
+    attrition,
+    management,
+    aiPlatform,
+    aiUsage: aiUsage * 1.15,
+    hitl,
+    implementation,
+    automation: clamp(automation * 0.85, 0, 1),
+    lift: clamp(lift * 0.9, 0, 1),
+    rework: clamp(rework * 1.25, 0, 1),
+  });
+
+  const upside = calculateAnnualSavings({
+    teamSize,
+    salary,
+    burden,
+    attrition,
+    management,
+    aiPlatform,
+    aiUsage: aiUsage * 0.9,
+    hitl,
+    implementation,
+    automation: clamp(automation * 1.1, 0, 1),
+    lift: clamp(lift * 1.15, 0, 1),
+    rework: clamp(rework * 0.8, 0, 1),
+  });
 
   outputs.employeeAnnual.textContent = money(annualEmployeeTco);
   outputs.aiAnnual.textContent = money(aiProgramWithResidualLabor);
@@ -156,6 +216,9 @@ function update() {
   outputs.payback.textContent = paybackMonths !== null ? `${paybackMonths.toFixed(1)} months` : "No payback";
   outputs.breakEven.textContent = breakEvenMonths !== null ? `Month ${breakEvenMonths}` : "Not reached";
   outputs.capacity.textContent = `${Math.max(0, effectiveHumanCapacityGain).toFixed(0)}%`;
+  outputs.conservativeSavings.textContent = money(conservative.annualSavings);
+  outputs.baseSavings.textContent = money(annualSavings);
+  outputs.upsideSavings.textContent = money(upside.annualSavings);
 
   outputs.annualSavings.classList.toggle("positive", annualSavings >= 0);
   outputs.annualSavings.classList.toggle("negative", annualSavings < 0);

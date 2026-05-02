@@ -25,6 +25,10 @@
           Model fully loaded employee cost against AI stack spend and implementation effort.
           Get annual delta, payback period, and break-even month in seconds.
         </p>
+        <p class="hero-mini">
+          Includes conservative, base, and upside scenarios so finance teams can evaluate
+          uncertainty before committing budget.
+        </p>
       </header>
 
       <section class="card">
@@ -115,6 +119,21 @@
         </article>
       </section>
 
+      <section class="card metrics scenario-band" aria-label="Scenario range">
+        <article>
+          <h3>Conservative Savings (Annual)</h3>
+          <p id="conservativeSavings" class="metric">$0</p>
+        </article>
+        <article>
+          <h3>Base Savings (Annual)</h3>
+          <p id="baseSavings" class="metric">$0</p>
+        </article>
+        <article>
+          <h3>Upside Savings (Annual)</h3>
+          <p id="upsideSavings" class="metric">$0</p>
+        </article>
+      </section>
+
       <section class="card analytics" aria-label="Comparison chart">
         <h2>Cost Comparison</h2>
         <div class="bars">
@@ -132,6 +151,16 @@
           </div>
         </div>
         <p id="insight" class="insight"></p>
+      </section>
+
+      <section class="card assumptions">
+        <h2>Assumptions & Methodology</h2>
+        <ul>
+          <li>Employee TCO includes salary, burden, attrition, and management/QA overhead.</li>
+          <li>AI cost includes platform + usage + human-in-the-loop + one-time implementation.</li>
+          <li>Residual labor is the non-automated workload adjusted by productivity lift and rework.</li>
+          <li>Scenario range adjusts automation, rework, and AI usage to reflect uncertainty.</li>
+        </ul>
       </section>
 
       <section class="card section-grid">
@@ -193,6 +222,18 @@
           assumptions.
         </p>
         <a href="#" aria-label="Book ROI review">Book ROI Review</a>
+        <a class="secondary-link" href="#" aria-label="Download CFO memo template">
+          Download CFO Memo Template
+        </a>
+      </section>
+
+      <section class="card links">
+        <h2>Related Calculators</h2>
+        <ul>
+          <li><a href="#">AI Customer Support ROI Calculator</a></li>
+          <li><a href="#">AI SDR Productivity Calculator</a></li>
+          <li><a href="#">AI Content Team Cost Calculator</a></li>
+        </ul>
       </section>
     </main>
 
