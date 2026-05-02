@@ -3,82 +3,196 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AI Cost Calculator</title>
+    <title>AI vs Employee Cost Calculator</title>
+    <meta
+      name="description"
+      content="Estimate annual savings, payback period, and break-even timeline with a transparent AI vs employee TCO calculator."
+    />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&family=JetBrains+Mono:wght@500&display=swap"
       rel="stylesheet"
     />
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <div class="page-glow" aria-hidden="true"></div>
     <main class="app">
-      <header class="hero">
-        <p class="eyebrow">Decision Tool</p>
-        <h1>AI Cost vs Human Operations</h1>
+      <header class="hero card">
+        <p class="eyebrow">CFO Decision Tool</p>
+        <h1>AI vs Employee Cost Calculator</h1>
         <p>
-          Compare monthly operating cost, projected savings, and productivity lift with
-          transparent assumptions.
+          Model fully loaded employee cost against AI stack spend and implementation effort.
+          Get annual delta, payback period, and break-even month in seconds.
         </p>
       </header>
 
-      <section class="card input-grid" aria-label="Input controls">
-        <label>
-          Team Size
-          <input id="teamSize" type="number" min="1" value="5" />
-        </label>
-        <label>
-          Avg Salary Per Person (USD)
-          <input id="salary" type="number" min="0" value="7000" step="100" />
-        </label>
-        <label>
-          Monthly AI Platform Cost (USD)
-          <input id="aiCost" type="number" min="0" value="1800" step="50" />
-        </label>
-        <label>
-          Productivity Lift from AI (%)
-          <input id="lift" type="number" min="0" max="100" value="35" step="1" />
-        </label>
+      <section class="card">
+        <h2>Calculator</h2>
+        <div class="preset-row" role="group" aria-label="Department presets">
+          <button class="preset" data-preset="support" type="button">Support</button>
+          <button class="preset" data-preset="sdr" type="button">SDR</button>
+          <button class="preset" data-preset="backoffice" type="button">Back Office</button>
+          <button class="preset" data-preset="content" type="button">Content</button>
+        </div>
+
+        <div class="input-grid" aria-label="Input controls">
+          <label>
+            Team Size
+            <input id="teamSize" type="number" min="1" value="8" />
+          </label>
+          <label>
+            Monthly Salary Per Employee (USD)
+            <input id="salary" type="number" min="0" value="6200" step="100" />
+          </label>
+          <label>
+            Employee Burden Rate (%)
+            <input id="burden" type="number" min="0" max="200" value="28" step="1" />
+          </label>
+          <label>
+            Attrition / Backfill Cost (%)
+            <input id="attrition" type="number" min="0" max="100" value="12" step="1" />
+          </label>
+          <label>
+            QA & Management Overhead (%)
+            <input id="management" type="number" min="0" max="100" value="15" step="1" />
+          </label>
+          <label>
+            AI Monthly Platform Cost (USD)
+            <input id="aiPlatform" type="number" min="0" value="7800" step="100" />
+          </label>
+          <label>
+            AI Monthly Usage Cost (USD)
+            <input id="aiUsage" type="number" min="0" value="3400" step="50" />
+          </label>
+          <label>
+            Human-in-the-Loop Cost (USD/mo)
+            <input id="hitl" type="number" min="0" value="2200" step="50" />
+          </label>
+          <label>
+            One-Time Implementation Cost (USD)
+            <input id="implementation" type="number" min="0" value="22000" step="500" />
+          </label>
+          <label>
+            Automation Suitability (%)
+            <input id="automation" type="number" min="0" max="100" value="62" step="1" />
+          </label>
+          <label>
+            AI Productivity Lift on Remaining Work (%)
+            <input id="lift" type="number" min="0" max="100" value="28" step="1" />
+          </label>
+          <label>
+            Rework / Error Rate Penalty (%)
+            <input id="rework" type="number" min="0" max="100" value="8" step="1" />
+          </label>
+        </div>
       </section>
 
       <section class="card metrics" aria-label="Key results">
         <article>
-          <h2>Human Monthly Cost</h2>
-          <p id="humanMonthly" class="metric">$0</p>
+          <h3>Annual Employee TCO</h3>
+          <p id="employeeAnnual" class="metric">$0</p>
         </article>
         <article>
-          <h2>AI Monthly Cost</h2>
-          <p id="aiMonthly" class="metric">$0</p>
+          <h3>Annual AI Program Cost</h3>
+          <p id="aiAnnual" class="metric">$0</p>
         </article>
         <article>
-          <h2>Estimated Monthly Savings</h2>
-          <p id="savingsMonthly" class="metric positive">$0</p>
+          <h3>Annual Net Savings</h3>
+          <p id="annualSavings" class="metric positive">$0</p>
         </article>
         <article>
-          <h2>Adjusted Team Output</h2>
-          <p id="productivity" class="metric">0%</p>
+          <h3>Payback Period</h3>
+          <p id="payback" class="metric">0 months</p>
+        </article>
+        <article>
+          <h3>Break-even Month</h3>
+          <p id="breakEven" class="metric">Month 0</p>
+        </article>
+        <article>
+          <h3>Effective Capacity Gain</h3>
+          <p id="capacity" class="metric">0%</p>
         </article>
       </section>
 
-      <section class="card analytics" aria-label="Analytics section">
-        <h2>Analytics</h2>
+      <section class="card analytics" aria-label="Comparison chart">
+        <h2>Cost Comparison</h2>
         <div class="bars">
           <div>
-            <span>Human Cost</span>
-            <div class="bar-track"><div id="humanBar" class="bar human"></div></div>
+            <span>Employee TCO</span>
+            <div class="bar-track"><div id="employeeBar" class="bar employee"></div></div>
           </div>
           <div>
-            <span>AI Cost</span>
+            <span>AI Program Cost</span>
             <div class="bar-track"><div id="aiBar" class="bar ai"></div></div>
           </div>
           <div>
-            <span>Savings</span>
+            <span>Net Savings</span>
             <div class="bar-track"><div id="savingsBar" class="bar savings"></div></div>
           </div>
         </div>
         <p id="insight" class="insight"></p>
+      </section>
+
+      <section class="card section-grid">
+        <article>
+          <h2>AI vs Traditional Team Model</h2>
+          <ul>
+            <li>Traditional model scales linearly with headcount and overhead.</li>
+            <li>AI model front-loads implementation, then scales with volume.</li>
+            <li>Best outcomes come from AI + human review on high-risk tasks.</li>
+          </ul>
+        </article>
+        <article>
+          <h2>Common Use Cases</h2>
+          <ul>
+            <li>Customer support deflection and ticket triage</li>
+            <li>Sales development outbound personalization</li>
+            <li>Back-office document and workflow processing</li>
+            <li>Content drafting and repurposing</li>
+          </ul>
+        </article>
+      </section>
+
+      <section class="card faq">
+        <h2>FAQ</h2>
+        <details>
+          <summary>Is AI more expensive than humans?</summary>
+          <p>
+            It depends on volume, quality requirements, and implementation cost. At higher
+            repeatable volumes, AI often reduces cost per unit.
+          </p>
+        </details>
+        <details>
+          <summary>How much does it actually cost to use AI?</summary>
+          <p>
+            Typical cost includes platform fees, usage fees, monitoring, and human oversight.
+            This calculator separates each line item.
+          </p>
+        </details>
+        <details>
+          <summary>How much does AI cost per minute?</summary>
+          <p>
+            Per-minute cost depends on token/model usage, workflow complexity, and review rates.
+            Convert monthly usage into unit economics for your team volume.
+          </p>
+        </details>
+        <details>
+          <summary>What is the average cost of AI?</summary>
+          <p>
+            There is no single average. Costs vary by task type, model selection, and the level
+            of human quality control you require.
+          </p>
+        </details>
+      </section>
+
+      <section class="card cta">
+        <h2>Next Step</h2>
+        <p>
+          Use these outputs to prepare a board-ready decision memo with best-case and base-case
+          assumptions.
+        </p>
+        <a href="#" aria-label="Book ROI review">Book ROI Review</a>
       </section>
     </main>
 
