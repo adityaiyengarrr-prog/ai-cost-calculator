@@ -26,6 +26,10 @@ const outputs = {
   conservativeSavings: document.getElementById("conservativeSavings"),
   baseSavings: document.getElementById("baseSavings"),
   upsideSavings: document.getElementById("upsideSavings"),
+  confidenceScore: document.getElementById("confidenceScore"),
+  requiredAutomation: document.getElementById("requiredAutomation"),
+  maxAiMonthly: document.getElementById("maxAiMonthly"),
+  riskFlag: document.getElementById("riskFlag"),
   employeeBar: document.getElementById("employeeBar"),
   aiBar: document.getElementById("aiBar"),
   savingsBar: document.getElementById("savingsBar"),
@@ -135,6 +139,24 @@ function calculateAnnualSavings(inputs) {
   };
 }
 
+function requiredAutomationForBreakEven(inputs) {
+  const { teamSize, salary, burden, attrition, management, aiPlatform, aiUsage, hitl, implementation, lift, rework } = inputs;
+  const baseMonthlyLabor = teamSize * salary;
+  const fullyLoadedMonthlyLabor =
+    baseMonthlyLabor * (1 + burden + attrition + management);
+  const annualEmployeeTco = fullyLoadedMonthlyLabor * 12;
+  const annualAiBase = (aiPlatform + aiUsage + hitl) * 12 + implementation;
+  const laborCostWithoutAutomation =
+    (fullyLoadedMonthlyLabor * (1 + rework) * 12) / (1 + lift);
+
+  if (laborCostWithoutAutomation <= 0) {
+    return 1;
+  }
+
+  const ratio = (annualEmployeeTco - annualAiBase) / laborCostWithoutAutomation;
+  return clamp(1 - ratio, 0, 1);
+}
+
 function assignPreset(name) {
   const preset = presets[name];
   if (!preset) return;
@@ -159,7 +181,9 @@ function update() {
   const automation = clamp(safeNumber(fields.automation.value) / 100, 0, 1);
   const lift = clamp(safeNumber(fields.lift.value) / 100, 0, 1);
   const rework = clamp(safeNumber(fields.rework.value) / 100, 0, 1);
+
   const effectiveHumanCapacityGain = (automation + (1 - automation) * lift) * (1 - rework) * 100;
+
   const base = calculateAnnualSavings({
     teamSize,
     salary,
@@ -174,6 +198,7 @@ function update() {
     lift,
     rework,
   });
+
   const annualEmployeeTco = base.annualEmployeeTco;
   const aiProgramWithResidualLabor = base.aiProgramWithResidualLabor;
   const annualSavings = base.annualSavings;
@@ -215,6 +240,40 @@ function update() {
     rework: clamp(rework * 0.8, 0, 1),
   });
 
+  const maxAffordableAiMonthly =
+    base.fullyLoadedMonthlyLabor - base.adjustedAiEquivalentLaborCost + implementation / 12;
+  const requiredAutomation = requiredAutomationForBreakEven({
+    teamSize,
+    salary,
+    burden,
+    attrition,
+    management,
+    aiPlatform,
+    aiUsage,
+    hitl,
+    implementation,
+    lift,
+    rework,
+  });
+
+  let confidenceScore = 55;
+  if (annualSavings > 0) confidenceScore += 15;
+  if (conservative.annualSavings > 0) confidenceScore += 10;
+  if (paybackMonths !== null && paybackMonths <= 12) confidenceScore += 10;
+  if (paybackMonths !== null && paybackMonths <= 6) confidenceScore += 5;
+  if (rework <= 0.1) confidenceScore += 5;
+  if (automation >= 0.6) confidenceScore += 5;
+  if (annualSavings < 0) confidenceScore -= 20;
+  if (conservative.annualSavings < 0) confidenceScore -= 10;
+  confidenceScore = clamp(confidenceScore, 0, 100);
+
+  let riskFlag = "Stable";
+  if (conservative.annualSavings < 0 || paybackMonths === null) {
+    riskFlag = "High";
+  } else if (paybackMonths > 12 || confidenceScore < 60) {
+    riskFlag = "Medium";
+  }
+
   outputs.employeeAnnual.textContent = money(annualEmployeeTco);
   outputs.aiAnnual.textContent = money(aiProgramWithResidualLabor);
   outputs.annualSavings.textContent = money(annualSavings);
@@ -223,17 +282,24 @@ function update() {
   outputs.roi.textContent = `${yearOneRoi.toFixed(0)}%`;
   outputs.capacity.textContent = `${Math.max(0, effectiveHumanCapacityGain).toFixed(0)}%`;
   outputs.monthlySavings.textContent = money(monthlySavings);
-  outputs.monthlySavings.classList.toggle("positive", monthlySavings >= 0);
-  outputs.monthlySavings.classList.toggle("negative", monthlySavings < 0);
   outputs.threeYearBenefit.textContent = money(threeYearBenefit);
-  outputs.threeYearBenefit.classList.toggle("positive", threeYearBenefit >= 0);
-  outputs.threeYearBenefit.classList.toggle("negative", threeYearBenefit < 0);
+
   outputs.conservativeSavings.textContent = money(conservative.annualSavings);
   outputs.baseSavings.textContent = money(annualSavings);
   outputs.upsideSavings.textContent = money(upside.annualSavings);
+  outputs.confidenceScore.textContent = `${confidenceScore.toFixed(0)}/100`;
+  outputs.requiredAutomation.textContent = `${(requiredAutomation * 100).toFixed(0)}%`;
+  outputs.maxAiMonthly.textContent = money(Math.max(0, maxAffordableAiMonthly));
+  outputs.riskFlag.textContent = riskFlag;
 
   outputs.annualSavings.classList.toggle("positive", annualSavings >= 0);
   outputs.annualSavings.classList.toggle("negative", annualSavings < 0);
+  outputs.monthlySavings.classList.toggle("positive", monthlySavings >= 0);
+  outputs.monthlySavings.classList.toggle("negative", monthlySavings < 0);
+  outputs.threeYearBenefit.classList.toggle("positive", threeYearBenefit >= 0);
+  outputs.threeYearBenefit.classList.toggle("negative", threeYearBenefit < 0);
+  outputs.riskFlag.classList.toggle("positive", riskFlag === "Stable");
+  outputs.riskFlag.classList.toggle("negative", riskFlag === "High");
 
   const max = Math.max(annualEmployeeTco, aiProgramWithResidualLabor, Math.abs(annualSavings), 1);
   outputs.employeeBar.style.width = `${(annualEmployeeTco / max) * 100}%`;
@@ -241,9 +307,9 @@ function update() {
   outputs.savingsBar.style.width = `${(Math.abs(annualSavings) / max) * 100}%`;
 
   if (annualSavings >= 0) {
-    outputs.insight.textContent = `AI-led delivery saves ${money(annualSavings)} annually (${money(monthlySavings)} per month), reaches break-even ${outputs.breakEven.textContent.toLowerCase()}, and delivers ${yearOneRoi.toFixed(0)}% Year-1 ROI.`;
+    outputs.insight.textContent = `AI-led delivery saves ${money(annualSavings)} annually (${money(monthlySavings)} per month), reaches break-even ${outputs.breakEven.textContent.toLowerCase()}, and delivers ${yearOneRoi.toFixed(0)}% Year-1 ROI. Confidence score: ${confidenceScore.toFixed(0)}/100.`;
   } else {
-    outputs.insight.textContent = `Current assumptions show a ${money(Math.abs(annualSavings))} annual gap. Improve automation suitability, reduce rework, or lower AI stack costs before rollout.`;
+    outputs.insight.textContent = `Current assumptions show a ${money(Math.abs(annualSavings))} annual gap. Improve automation suitability to at least ${outputs.requiredAutomation.textContent}, reduce rework, or lower AI stack costs before rollout.`;
   }
 }
 

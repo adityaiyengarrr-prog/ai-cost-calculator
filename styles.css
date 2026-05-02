@@ -225,6 +225,10 @@ ul {
   color: var(--muted);
 }
 
+.links a {
+  color: var(--accent-strong);
+}
+
 .faq details {
   border-top: 1px solid var(--line);
   padding: 10px 0;
