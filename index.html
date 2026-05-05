@@ -21,10 +21,8 @@
       <section class="hero card">
         <p class="tag">Free • No Sign-up</p>
         <h1>AI Token Cost Calculator & Budget Planner</h1>
-        <p>
-          Forecast token spend by workflow, compare providers, and see monthly/yearly budget impact
-          in under 30 seconds.
-        </p>
+        <p>Estimate true AI operating cost, ROI, and break-even in under 30 seconds.</p>
+        <p class="hero-sub">Built for founders, product teams, and agency operators planning LLM margins.</p>
       </section>
 
       <section class="card calculator" aria-label="Calculator">
@@ -52,16 +50,20 @@
             <input id="outputTokens" type="number" min="0" value="600" step="1" />
           </label>
           <label>
-            Runs / Requests
-            <input id="runs" type="number" min="1" value="1000" step="1" />
-          </label>
-          <label>
             Calls per Day
             <input id="callsPerDay" type="number" min="0" value="200" step="1" />
           </label>
           <label>
             Working Days / Month
             <input id="workingDays" type="number" min="1" value="30" step="1" />
+          </label>
+          <label>
+            Ops Overhead (%)
+            <input id="overheadPercent" type="number" min="0" value="10" step="1" />
+          </label>
+          <label>
+            Target Margin (%)
+            <input id="marginPercent" type="number" min="0" value="15" step="1" />
           </label>
           <label>
             Traditional Monthly Cost (USD)
@@ -78,7 +80,11 @@
           <article><h3>Estimated Monthly Cost</h3><p id="monthlyCost">$0.00</p></article>
           <article><h3>Estimated Yearly Cost</h3><p id="yearlyCost">$0.00</p></article>
           <article><h3>Estimated Monthly Savings vs Traditional</h3><p id="monthlySavings">$0.00</p></article>
+          <article><h3>Estimated Annual Savings</h3><p id="annualSavings">$0.00</p></article>
+          <article><h3>Cost Reduction ROI</h3><p id="roiPercent">0.0%</p></article>
+          <article><h3>Break-even on $500 Setup</h3><p id="breakEvenDays">0 days</p></article>
         </div>
+        <p id="volumeSummary" class="volume-summary" aria-live="polite"></p>
 
         <p class="disclaimer">
           Prices are estimates based on publicly available pricing and may change. Always verify
@@ -127,6 +133,11 @@
             <li>Support copilots and agent workflows</li>
             <li>Content, research, and internal assistants</li>
           </ul>
+          <p class="internal-links">
+            Next reads: <a href="/blog/openai-vs-anthropic-token-cost-benchmarks">provider benchmarks</a>,
+            <a href="/blog/reduce-llm-spend-prompt-output-controls">spend reduction playbook</a>,
+            <a href="/blog/ai-token-pricing-2026-quarterly-update">latest pricing updates</a>.
+          </p>
         </article>
       </section>
 

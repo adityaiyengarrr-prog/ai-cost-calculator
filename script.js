@@ -18,10 +18,42 @@ const latestBlogs = [
 ];
 
 const PRESETS = {
-  chatbot: { inputTokens: 1200, outputTokens: 450, runs: 1000, callsPerDay: 200 },
-  rag: { inputTokens: 2800, outputTokens: 650, runs: 800, callsPerDay: 120 },
-  content: { inputTokens: 1800, outputTokens: 1200, runs: 600, callsPerDay: 60 },
-  agent: { inputTokens: 2200, outputTokens: 900, runs: 1200, callsPerDay: 240 },
+  chatbot: {
+    inputTokens: 1200,
+    outputTokens: 450,
+    callsPerDay: 200,
+    workingDays: 22,
+    overheadPercent: 10,
+    marginPercent: 15,
+    traditionalMonthlyCost: 2500,
+  },
+  rag: {
+    inputTokens: 2800,
+    outputTokens: 650,
+    callsPerDay: 120,
+    workingDays: 22,
+    overheadPercent: 12,
+    marginPercent: 20,
+    traditionalMonthlyCost: 4200,
+  },
+  content: {
+    inputTokens: 1800,
+    outputTokens: 1200,
+    callsPerDay: 60,
+    workingDays: 20,
+    overheadPercent: 8,
+    marginPercent: 15,
+    traditionalMonthlyCost: 3200,
+  },
+  agent: {
+    inputTokens: 2200,
+    outputTokens: 900,
+    callsPerDay: 240,
+    workingDays: 22,
+    overheadPercent: 15,
+    marginPercent: 25,
+    traditionalMonthlyCost: 6800,
+  },
 };
 
 const fields = {
@@ -29,9 +61,10 @@ const fields = {
   model: document.getElementById("model"),
   inputTokens: document.getElementById("inputTokens"),
   outputTokens: document.getElementById("outputTokens"),
-  runs: document.getElementById("runs"),
   callsPerDay: document.getElementById("callsPerDay"),
   workingDays: document.getElementById("workingDays"),
+  overheadPercent: document.getElementById("overheadPercent"),
+  marginPercent: document.getElementById("marginPercent"),
   traditionalMonthlyCost: document.getElementById("traditionalMonthlyCost"),
 };
 
@@ -42,7 +75,11 @@ const outputs = {
   monthlyCost: document.getElementById("monthlyCost"),
   yearlyCost: document.getElementById("yearlyCost"),
   monthlySavings: document.getElementById("monthlySavings"),
+  annualSavings: document.getElementById("annualSavings"),
+  breakEvenDays: document.getElementById("breakEvenDays"),
+  roiPercent: document.getElementById("roiPercent"),
   modelNotice: document.getElementById("modelNotice"),
+  volumeSummary: document.getElementById("volumeSummary"),
   blogList: document.getElementById("blogList"),
   comparisonBody: document.getElementById("comparisonBody"),
 };
@@ -56,6 +93,10 @@ function usd(value) {
   }).format(value);
 }
 
+function integer(value) {
+  return new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 }).format(value);
+}
+
 function number(value, fallback = 0) {
   const n = Number(value);
   return Number.isFinite(n) ? n : fallback;
@@ -65,7 +106,7 @@ function fillModels() {
   models.forEach((item, index) => {
     const option = document.createElement("option");
     option.value = String(index);
-    option.textContent = `${item.provider} — ${item.model}`;
+    option.textContent = `${item.provider} - ${item.model}`;
     fields.model.appendChild(option);
   });
 }
@@ -100,28 +141,40 @@ function applyPreset() {
   if (!preset) return;
   fields.inputTokens.value = String(preset.inputTokens);
   fields.outputTokens.value = String(preset.outputTokens);
-  fields.runs.value = String(preset.runs);
   fields.callsPerDay.value = String(preset.callsPerDay);
+  fields.workingDays.value = String(preset.workingDays);
+  fields.overheadPercent.value = String(preset.overheadPercent);
+  fields.marginPercent.value = String(preset.marginPercent);
+  fields.traditionalMonthlyCost.value = String(preset.traditionalMonthlyCost);
+}
+
+function setUnavailable() {
+  outputs.inputCost.textContent = "N/A";
+  outputs.outputCost.textContent = "N/A";
+  outputs.costPerRun.textContent = "N/A";
+  outputs.monthlyCost.textContent = "N/A";
+  outputs.yearlyCost.textContent = "N/A";
+  outputs.monthlySavings.textContent = "N/A";
+  outputs.annualSavings.textContent = "N/A";
+  outputs.breakEvenDays.textContent = "N/A";
+  outputs.roiPercent.textContent = "N/A";
+  outputs.volumeSummary.textContent = "Update model pricing to see cost and ROI projections.";
 }
 
 function update() {
   const selected = models[number(fields.model.value, 0)] || models[0];
   const inputTokens = Math.max(0, number(fields.inputTokens.value, 0));
   const outputTokens = Math.max(0, number(fields.outputTokens.value, 0));
-  const runs = Math.max(1, number(fields.runs.value, 1));
   const callsPerDay = Math.max(0, number(fields.callsPerDay.value, 0));
   const workingDays = Math.max(1, number(fields.workingDays.value, 1));
+  const overheadPercent = Math.max(0, number(fields.overheadPercent.value, 0));
+  const marginPercent = Math.max(0, number(fields.marginPercent.value, 0));
   const traditionalMonthlyCost = Math.max(0, number(fields.traditionalMonthlyCost.value, 0));
 
   if (!selected || selected.needsVerification || selected.inputPerM === null || selected.outputPerM === null) {
     outputs.modelNotice.textContent = "Pricing needs verification for this model. Select a priced model or update model-pricing.js.";
     outputs.modelNotice.classList.add("warn");
-    outputs.inputCost.textContent = "N/A";
-    outputs.outputCost.textContent = "N/A";
-    outputs.costPerRun.textContent = "N/A";
-    outputs.monthlyCost.textContent = "N/A";
-    outputs.yearlyCost.textContent = "N/A";
-    outputs.monthlySavings.textContent = "N/A";
+    setUnavailable();
     return;
   }
 
@@ -130,27 +183,43 @@ function update() {
 
   const inputCostPerRun = (inputTokens / 1_000_000) * selected.inputPerM;
   const outputCostPerRun = (outputTokens / 1_000_000) * selected.outputPerM;
-  const totalPerRun = inputCostPerRun + outputCostPerRun;
+  const baseCostPerRun = inputCostPerRun + outputCostPerRun;
 
-  const monthlyRunsFromTraffic = callsPerDay * workingDays;
-  const modeledRuns = Math.max(runs, monthlyRunsFromTraffic);
-  const monthlyInput = inputCostPerRun * modeledRuns;
-  const monthlyOutput = outputCostPerRun * modeledRuns;
-  const monthlyCost = totalPerRun * modeledRuns;
+  const operationalMultiplier = 1 + overheadPercent / 100;
+  const suggestedSellingMultiplier = 1 + marginPercent / 100;
+  const adjustedCostPerRun = baseCostPerRun * operationalMultiplier;
+
+  const monthlyRuns = callsPerDay * workingDays;
+  const monthlyInput = inputCostPerRun * monthlyRuns;
+  const monthlyOutput = outputCostPerRun * monthlyRuns;
+  const monthlyCost = adjustedCostPerRun * monthlyRuns;
   const yearlyCost = monthlyCost * 12;
+
   const monthlySavings = traditionalMonthlyCost - monthlyCost;
+  const annualSavings = monthlySavings * 12;
+  const roiPercent = traditionalMonthlyCost > 0
+    ? (monthlySavings / traditionalMonthlyCost) * 100
+    : 0;
+
+  const dailySavings = workingDays > 0 ? monthlySavings / workingDays : 0;
+  const breakEvenDays = dailySavings > 0 ? Math.ceil(500 / dailySavings) : null;
 
   outputs.inputCost.textContent = usd(monthlyInput);
   outputs.outputCost.textContent = usd(monthlyOutput);
-  outputs.costPerRun.textContent = usd(totalPerRun);
+  outputs.costPerRun.textContent = usd(adjustedCostPerRun);
   outputs.monthlyCost.textContent = usd(monthlyCost);
   outputs.yearlyCost.textContent = usd(yearlyCost);
   outputs.monthlySavings.textContent = usd(monthlySavings);
+  outputs.annualSavings.textContent = usd(annualSavings);
+  outputs.roiPercent.textContent = `${roiPercent.toFixed(1)}%`;
+  outputs.breakEvenDays.textContent = breakEvenDays ? `${integer(breakEvenDays)} days` : "No break-even";
+  outputs.volumeSummary.textContent = `${integer(monthlyRuns)} monthly calls. Suggested client pricing floor: ${usd(adjustedCostPerRun * suggestedSellingMultiplier)} per request.`;
 }
 
 fillModels();
 renderComparisonTable();
 renderBlogs();
+applyPreset();
 update();
 
 if (fields.preset) {

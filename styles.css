@@ -39,6 +39,7 @@ h1 { margin: 8px 0; font-size: clamp(1.8rem, 5vw, 2.5rem); }
 h2 { margin: 0 0 12px; }
 h3 { margin: 0 0 8px; font-size: 0.95rem; color: var(--muted); }
 p { margin: 0; color: var(--muted); }
+.hero-sub { margin-top: 10px; font-size: 0.95rem; }
 
 .tag {
   display: inline-block;
@@ -114,6 +115,11 @@ button {
   margin-top: 12px;
   font-size: 0.85rem;
 }
+.volume-summary {
+  margin-top: 10px;
+  font-size: 0.9rem;
+  color: #155e75;
+}
 
 .table-wrap {
   overflow-x: auto;
@@ -145,6 +151,15 @@ button {
 }
 
 ul { margin: 0; padding-left: 18px; color: var(--muted); }
+.internal-links {
+  margin-top: 12px;
+  font-size: 0.9rem;
+}
+.internal-links a {
+  color: #0c4a6e;
+  text-decoration: none;
+}
+.internal-links a:hover { text-decoration: underline; }
 
 .faq details {
   border-top: 1px solid var(--line);
