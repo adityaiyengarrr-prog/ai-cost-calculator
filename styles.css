@@ -62,12 +62,20 @@ label {
   font-size: 0.9rem;
 }
 
-input, select {
+input, select, button {
   font: inherit;
   border: 1px solid var(--line);
   border-radius: 10px;
   padding: 10px;
   background: #fff;
+}
+
+button {
+  cursor: pointer;
+  border-color: #14b8a6;
+  background: #0f766e;
+  color: #ecfeff;
+  font-weight: 600;
 }
 
 .notice {
@@ -107,6 +115,29 @@ input, select {
   font-size: 0.85rem;
 }
 
+.table-wrap {
+  overflow-x: auto;
+}
+
+.comparison {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 640px;
+}
+
+.comparison th,
+.comparison td {
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  padding: 10px;
+  font-size: 0.9rem;
+}
+
+.comparison th {
+  color: var(--muted);
+  font-weight: 600;
+}
+
 .split {
   display: grid;
   gap: 12px;
@@ -126,6 +157,16 @@ ul { margin: 0; padding-left: 18px; color: var(--muted); }
 }
 
 summary { cursor: pointer; font-weight: 600; color: var(--text); }
+
+.cta p {
+  margin-bottom: 10px;
+}
+
+.cta-form {
+  display: grid;
+  gap: 8px;
+  max-width: 420px;
+}
 
 .blogs-head {
   display: flex;
@@ -182,4 +223,7 @@ summary { cursor: pointer; font-weight: 600; color: var(--text); }
 
 @media (max-width: 640px) {
   .card { padding: 14px; }
+  .comparison { min-width: 0; }
+  .comparison th,
+  .comparison td { font-size: 0.82rem; padding: 8px; }
 }

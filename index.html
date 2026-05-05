@@ -3,10 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AI Token Cost Calculator</title>
+    <title>AI Token Cost Calculator & Budget Planner</title>
     <meta
       name="description"
-      content="Calculate estimated AI model token costs across OpenAI, Anthropic, Gemini, Mistral, DeepSeek, Groq, and more."
+      content="Calculate AI token costs, compare providers, forecast monthly and yearly spend, and estimate ROI vs traditional workflows."
     />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -20,16 +20,25 @@
     <main class="wrap">
       <section class="hero card">
         <p class="tag">Free • No Sign-up</p>
-        <h1>AI Token Cost Calculator</h1>
+        <h1>AI Token Cost Calculator & Budget Planner</h1>
         <p>
-          Estimate input cost, output cost, run-level spend, and monthly spend across major AI
-          providers in seconds.
+          Forecast token spend by workflow, compare providers, and see monthly/yearly budget impact
+          in under 30 seconds.
         </p>
       </section>
 
       <section class="card calculator" aria-label="Calculator">
-        <h2>Token Cost Calculator</h2>
+        <h2>Instant Cost Estimator</h2>
         <div class="grid">
+          <label>
+            Workflow Preset
+            <select id="preset">
+              <option value="chatbot">Chatbot Support</option>
+              <option value="rag">RAG Assistant</option>
+              <option value="content">Content Generation</option>
+              <option value="agent">Agent Automation</option>
+            </select>
+          </label>
           <label>
             Provider / Model
             <select id="model"></select>
@@ -47,8 +56,16 @@
             <input id="runs" type="number" min="1" value="1000" step="1" />
           </label>
           <label>
-            Monthly Usage Multiplier (optional)
-            <input id="monthlyMultiplier" type="number" min="0" value="1" step="0.1" />
+            Calls per Day
+            <input id="callsPerDay" type="number" min="0" value="200" step="1" />
+          </label>
+          <label>
+            Working Days / Month
+            <input id="workingDays" type="number" min="1" value="30" step="1" />
+          </label>
+          <label>
+            Traditional Monthly Cost (USD)
+            <input id="traditionalMonthlyCost" type="number" min="0" value="2500" step="10" />
           </label>
         </div>
 
@@ -57,8 +74,10 @@
         <div class="results" aria-label="Results">
           <article><h3>Estimated Input Token Cost</h3><p id="inputCost">$0.00</p></article>
           <article><h3>Estimated Output Token Cost</h3><p id="outputCost">$0.00</p></article>
-          <article><h3>Total Cost Per Run</h3><p id="costPerRun">$0.00</p></article>
+          <article><h3>Total Cost Per Call</h3><p id="costPerRun">$0.00</p></article>
           <article><h3>Estimated Monthly Cost</h3><p id="monthlyCost">$0.00</p></article>
+          <article><h3>Estimated Yearly Cost</h3><p id="yearlyCost">$0.00</p></article>
+          <article><h3>Estimated Monthly Savings vs Traditional</h3><p id="monthlySavings">$0.00</p></article>
         </div>
 
         <p class="disclaimer">
@@ -68,11 +87,28 @@
       </section>
 
       <section class="card">
+        <h2>Provider Comparison Snapshot</h2>
+        <div class="table-wrap">
+          <table class="comparison">
+            <thead>
+              <tr>
+                <th>Provider</th>
+                <th>Model</th>
+                <th>Input / 1M</th>
+                <th>Output / 1M</th>
+              </tr>
+            </thead>
+            <tbody id="comparisonBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="card">
         <h2>Token Basics</h2>
         <ul>
           <li>Input tokens are prompt/context tokens sent to the model.</li>
           <li>Output tokens are generated response tokens from the model.</li>
-          <li>Total spend depends on both token volumes and provider/model rates.</li>
+          <li>1,000 tokens is roughly 750 words in English for planning purposes.</li>
         </ul>
       </section>
 
@@ -97,6 +133,20 @@
       <section class="card faq">
         <h2>FAQ</h2>
         <details>
+          <summary>How do I calculate AI token costs?</summary>
+          <p>
+            Multiply your input tokens and output tokens by each model rate, then multiply by call
+            volume. This calculator automates that formula.
+          </p>
+        </details>
+        <details>
+          <summary>How many words is 1,000 tokens?</summary>
+          <p>
+            A common planning assumption is around 750 words for 1,000 tokens in English, though
+            this varies by language and formatting.
+          </p>
+        </details>
+        <details>
           <summary>Is this an exact invoice prediction?</summary>
           <p>No. It is a directional estimate and should be validated against provider billing.</p>
         </details>
@@ -107,10 +157,16 @@
             Those entries are intentionally flagged instead of guessed.
           </p>
         </details>
-        <details>
-          <summary>How do I reduce cost quickly?</summary>
-          <p>Lower prompt size, cap output length, cache repeated context, and choose a lower-cost model.</p>
-        </details>
+      </section>
+
+      <section class="card cta">
+        <h2>Get the API Cost Planning Sheet</h2>
+        <p>Receive a downloadable planning template and cost optimization checklist.</p>
+        <form class="cta-form" action="#" method="post">
+          <label for="email">Work Email</label>
+          <input id="email" name="email" type="email" placeholder="you@company.com" required />
+          <button type="submit">Send Me the Template</button>
+        </form>
       </section>
 
       <section class="card blogs">
@@ -128,5 +184,37 @@
 
     <script src="model-pricing.js"></script>
     <script src="script.js"></script>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "How do I calculate AI token costs?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Multiply input and output tokens by each model's per-million token rates, then multiply by total call volume."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How many words is 1,000 tokens?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "A practical estimate is roughly 750 words per 1,000 tokens in English."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Is this an exact invoice prediction?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "No. It is an estimate and should be validated against provider billing."
+            }
+          }
+        ]
+      }
+    </script>
   </body>
 </html>
