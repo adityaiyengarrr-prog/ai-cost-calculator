@@ -3,10 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AI Token Cost Calculator</title>
+    <title>AI Token Cost & ROI Calculator</title>
     <meta
       name="description"
-      content="Estimate AI token spend by model, request volume, prompt/output size, and cache hit rate. Compare AI spend vs human-team cost in seconds."
+      content="Estimate AI token spend, monthly AI program cost, ROI, payback period, and break-even point with model-aware pricing and growth scenarios."
     />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -20,23 +20,23 @@
     <main class="app">
       <header class="hero card">
         <p class="eyebrow">AI Cost Planning</p>
-        <h1>AI Token Cost Calculator</h1>
+        <h1>AI Token Cost & ROI Calculator</h1>
         <p>
-          Estimate monthly and annual token spend with model-aware pricing, caching assumptions,
-          and usage growth scenarios. See cost per request, per user, and AI vs employee cost.
+          Model your full AI program economics in under 2 minutes. Forecast token spend, platform
+          overhead, savings versus manual operations, and break-even timeline.
         </p>
         <div class="hero-kpis">
           <article>
-            <p class="kpi-label">Best For</p>
-            <p class="kpi-value">PM + Finance Teams</p>
+            <p class="kpi-label">Primary Outcome</p>
+            <p class="kpi-value">Annual Savings + ROI</p>
           </article>
           <article>
-            <p class="kpi-label">Decision Mode</p>
-            <p class="kpi-value">Base + Range</p>
+            <p class="kpi-label">Planning Mode</p>
+            <p class="kpi-value">Base + Conservative + Growth</p>
           </article>
           <article>
-            <p class="kpi-label">Primary Output</p>
-            <p class="kpi-value">Token Spend + ROI</p>
+            <p class="kpi-label">Built For</p>
+            <p class="kpi-value">Finance, Ops, Product</p>
           </article>
         </div>
       </header>
@@ -111,6 +111,14 @@
             12-Month Usage Growth (%)
             <input id="growthRate" type="number" min="0" max="300" value="40" step="1" />
           </label>
+          <label>
+            Monthly Revenue Influenced (USD)
+            <input id="monthlyRevenue" type="number" min="0" value="120000" step="1000" />
+          </label>
+          <label>
+            AI Impact on Revenue (%)
+            <input id="revenueLift" type="number" min="0" max="100" value="8" step="1" />
+          </label>
         </div>
       </section>
 
@@ -122,12 +130,14 @@
         <article><h3>Cost Per Request</h3><p id="costPerRequest" class="metric">$0</p></article>
         <article><h3>Cost Per User / Month</h3><p id="costPerUser" class="metric">$0</p></article>
         <article><h3>Annual Savings vs Human Team</h3><p id="annualSavings" class="metric positive">$0</p></article>
+        <article><h3>ROI (Year 1)</h3><p id="roi" class="metric">0%</p></article>
       </section>
 
       <section class="card metrics scenario-band" aria-label="Scenario range">
         <article><h3>Conservative Annual Cost</h3><p id="conservativeAnnual" class="metric">$0</p></article>
         <article><h3>Base Annual Cost</h3><p id="baseAnnual" class="metric">$0</p></article>
         <article><h3>Growth Annual Cost</h3><p id="growthAnnual" class="metric">$0</p></article>
+        <article><h3>Break-Even Requests / Day</h3><p id="breakEvenDaily" class="metric">0</p></article>
       </section>
 
       <section class="card metrics" aria-label="Token and unit economics">
@@ -135,6 +145,11 @@
         <article><h3>Monthly Output Tokens</h3><p id="monthlyOutputTokens" class="metric">0</p></article>
         <article><h3>Monthly Cached Tokens</h3><p id="monthlyCachedTokens" class="metric">0</p></article>
         <article><h3>Payback Period</h3><p id="payback" class="metric">0 months</p></article>
+      </section>
+
+      <section class="card decision-card">
+        <h2 class="recommendation-headline" id="recommendationHeadline">Decision signal loading...</h2>
+        <p class="recommendation-body" id="recommendationBody"></p>
       </section>
 
       <section class="card analytics" aria-label="Comparison chart">
@@ -164,6 +179,7 @@
           <li>Cached input share is charged at cached-input pricing when supported by model.</li>
           <li>Total AI cost includes token spend, platform fees, and human review.</li>
           <li>Year-1 cost includes one-time implementation.</li>
+          <li>ROI includes both labor savings and modeled revenue lift.</li>
         </ul>
       </section>
 
@@ -172,8 +188,8 @@
           <h2>AI vs Traditional</h2>
           <ul>
             <li>Human teams scale mostly linearly with volume.</li>
-            <li>AI spend scales by tokens and can be optimized with cache and prompt quality.</li>
-            <li>Token-level measurement gives earlier cost control than monthly invoices alone.</li>
+            <li>AI spend scales by tokens and can be optimized via caching and prompt design.</li>
+            <li>Token-level tracking surfaces cost drivers earlier than invoice-level review.</li>
           </ul>
         </article>
         <article>
@@ -186,11 +202,11 @@
           </ul>
         </article>
         <article>
-          <h2>Why This Tool</h2>
+          <h2>How To Outperform</h2>
           <ul>
-            <li>Model-based token pricing (input/output/cached).</li>
-            <li>Retry and tool-call overhead included.</li>
-            <li>Base + conservative + growth scenarios for planning.</li>
+            <li>Reduce retries using stronger prompt guardrails and validation.</li>
+            <li>Shift repetitive context to cacheable blocks.</li>
+            <li>Limit output length by response templates and strict completion budgets.</li>
           </ul>
         </article>
       </section>
@@ -202,12 +218,12 @@
           <p>Sum input prompt tokens, overhead/tool tokens, and output tokens for each request.</p>
         </details>
         <details>
-          <summary>Why is cached input cheaper?</summary>
-          <p>Some providers discount repeated context tokens when cached and reused.</p>
+          <summary>What causes AI cost spikes?</summary>
+          <p>Request growth, longer prompts, larger outputs, retries, and extra tool calls.</p>
         </details>
         <details>
-          <summary>What drives AI cost spikes?</summary>
-          <p>Request growth, longer prompts, more output tokens, retries, and tool-call expansion.</p>
+          <summary>How can I improve ROI fastest?</summary>
+          <p>Reduce retries, increase cache hit rate, and cap output length on low-value workflows.</p>
         </details>
       </section>
 

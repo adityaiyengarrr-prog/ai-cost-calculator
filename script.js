@@ -21,6 +21,8 @@ const presets = {
     implementation: 9000,
     humanMonthlyCost: 82000,
     growthRate: 35,
+    monthlyRevenue: 260000,
+    revenueLift: 6,
   },
   research: {
     model: "gpt-5",
@@ -38,6 +40,8 @@ const presets = {
     implementation: 18000,
     humanMonthlyCost: 94000,
     growthRate: 45,
+    monthlyRevenue: 420000,
+    revenueLift: 5,
   },
   content: {
     model: "gpt-5-mini",
@@ -55,6 +59,8 @@ const presets = {
     implementation: 12000,
     humanMonthlyCost: 76000,
     growthRate: 40,
+    monthlyRevenue: 300000,
+    revenueLift: 7,
   },
   agent: {
     model: "gpt-5",
@@ -72,6 +78,8 @@ const presets = {
     implementation: 26000,
     humanMonthlyCost: 136000,
     growthRate: 60,
+    monthlyRevenue: 680000,
+    revenueLift: 4,
   },
 };
 
@@ -91,6 +99,8 @@ const fields = {
   implementation: document.getElementById("implementation"),
   humanMonthlyCost: document.getElementById("humanMonthlyCost"),
   growthRate: document.getElementById("growthRate"),
+  monthlyRevenue: document.getElementById("monthlyRevenue"),
+  revenueLift: document.getElementById("revenueLift"),
 };
 
 const outputs = {
@@ -101,9 +111,11 @@ const outputs = {
   costPerRequest: document.getElementById("costPerRequest"),
   costPerUser: document.getElementById("costPerUser"),
   annualSavings: document.getElementById("annualSavings"),
+  roi: document.getElementById("roi"),
   conservativeAnnual: document.getElementById("conservativeAnnual"),
   baseAnnual: document.getElementById("baseAnnual"),
   growthAnnual: document.getElementById("growthAnnual"),
+  breakEvenDaily: document.getElementById("breakEvenDaily"),
   monthlyInputTokens: document.getElementById("monthlyInputTokens"),
   monthlyOutputTokens: document.getElementById("monthlyOutputTokens"),
   monthlyCachedTokens: document.getElementById("monthlyCachedTokens"),
@@ -112,6 +124,8 @@ const outputs = {
   aiBar: document.getElementById("aiBar"),
   savingsBar: document.getElementById("savingsBar"),
   insight: document.getElementById("insight"),
+  recommendationHeadline: document.getElementById("recommendationHeadline"),
+  recommendationBody: document.getElementById("recommendationBody"),
 };
 
 function safeNumber(value, fallback = 0) {
@@ -207,6 +221,8 @@ function update() {
     implementation: Math.max(0, safeNumber(fields.implementation.value, 0)),
     humanMonthlyCost: Math.max(0, safeNumber(fields.humanMonthlyCost.value, 0)),
     growthRate: clamp(safeNumber(fields.growthRate.value) / 100, 0, 3),
+    monthlyRevenue: Math.max(0, safeNumber(fields.monthlyRevenue.value, 0)),
+    revenueLift: clamp(safeNumber(fields.revenueLift.value) / 100, 0, 1),
   };
 
   const base = estimateAnnualCost(inputs, 1);
@@ -228,20 +244,27 @@ function update() {
   );
 
   const annualHumanCost = inputs.humanMonthlyCost * 12;
+  const annualRevenueLift = inputs.monthlyRevenue * inputs.revenueLift * 12;
   const annualSavings = annualHumanCost - base.annualAiCost;
-  const paybackMonths =
-    annualSavings > 0 ? inputs.implementation / ((annualSavings + inputs.implementation) / 12) : null;
+  const annualBenefit = annualSavings + annualRevenueLift;
+  const roi = base.annualAiCost > 0 ? (annualBenefit / base.annualAiCost) * 100 : 0;
+  const monthlyNetBenefit = annualBenefit / 12;
+  const paybackMonths = monthlyNetBenefit > 0 ? inputs.implementation / monthlyNetBenefit : null;
+  const costPerRequest = base.monthlyAiCost / Math.max(1, base.monthlyRequests);
+  const breakEvenDailyRequests = costPerRequest > 0 ? Math.ceil((inputs.humanMonthlyCost / 30) / costPerRequest) : 0;
 
   outputs.monthlyRequests.textContent = Math.round(base.monthlyRequests).toLocaleString("en-US");
   outputs.monthlyTokenCost.textContent = money(base.monthlyTokenCost);
   outputs.monthlyAiCost.textContent = money(base.monthlyAiCost);
   outputs.annualAiCost.textContent = money(base.annualAiCost);
-  outputs.costPerRequest.textContent = moneyPrecise(base.monthlyAiCost / Math.max(1, base.monthlyRequests));
+  outputs.costPerRequest.textContent = moneyPrecise(costPerRequest);
   outputs.costPerUser.textContent = moneyPrecise(base.monthlyAiCost / inputs.monthlyUsers);
   outputs.annualSavings.textContent = money(annualSavings);
+  outputs.roi.textContent = `${roi.toFixed(1)}%`;
   outputs.conservativeAnnual.textContent = money(conservative.annualAiCost);
   outputs.baseAnnual.textContent = money(base.annualAiCost);
   outputs.growthAnnual.textContent = money(growth.annualAiCost);
+  outputs.breakEvenDaily.textContent = breakEvenDailyRequests.toLocaleString("en-US");
 
   outputs.monthlyInputTokens.textContent = Math.round(base.grossMonthlyInputTokens).toLocaleString("en-US");
   outputs.monthlyOutputTokens.textContent = Math.round(base.monthlyOutputTokens).toLocaleString("en-US");
@@ -256,12 +279,22 @@ function update() {
   outputs.aiBar.style.width = `${(base.annualAiCost / max) * 100}%`;
   outputs.savingsBar.style.width = `${(Math.abs(annualSavings) / max) * 100}%`;
 
+  if (annualBenefit > 0) {
+    outputs.recommendationHeadline.textContent = "Proceed: economics are positive in the base case.";
+    outputs.recommendationBody.textContent = `Estimated year-1 benefit is ${money(annualBenefit)} with ${roi.toFixed(
+      1
+    )}% ROI. Prioritize cache optimization and retry reduction to protect margin as usage grows.`;
+  } else {
+    outputs.recommendationHeadline.textContent = "Hold: improve assumptions before scaling.";
+    outputs.recommendationBody.textContent = `Current model shows negative year-1 benefit (${money(
+      annualBenefit
+    )}). Improve cache share, reduce output length, and tighten retry controls before rollout.`;
+  }
+
   if (annualSavings >= 0) {
     outputs.insight.textContent = `Base case: ${money(base.annualAiCost)} annual AI cost vs ${money(
       annualHumanCost
-    )} human cost, saving ${money(annualSavings)} per year. Cost per request is ${moneyPrecise(
-      base.monthlyAiCost / Math.max(1, base.monthlyRequests)
-    )}.`;
+    )} human cost, saving ${money(annualSavings)} per year. Cost per request is ${moneyPrecise(costPerRequest)}.`;
   } else {
     outputs.insight.textContent = `Current configuration costs ${money(
       Math.abs(annualSavings)
