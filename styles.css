@@ -127,7 +127,58 @@ ul { margin: 0; padding-left: 18px; color: var(--muted); }
 
 summary { cursor: pointer; font-weight: 600; color: var(--text); }
 
-.links a { color: #0369a1; }
+.blogs-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.blogs-head a {
+  color: #0369a1;
+  font-size: 0.9rem;
+  text-decoration: none;
+}
+
+.blogs-copy {
+  margin-top: 8px;
+}
+
+.blog-list {
+  margin-top: 12px;
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.blog-card {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #f8fbff;
+  padding: 12px;
+}
+
+.blog-meta {
+  margin: 0 0 6px;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #0f766e;
+}
+
+.blog-card h3 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.blog-card a {
+  color: var(--text);
+  text-decoration: none;
+}
+
+.blog-card a:hover {
+  text-decoration: underline;
+}
 
 @media (max-width: 640px) {
   .card { padding: 14px; }

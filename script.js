@@ -1,4 +1,21 @@
 const models = window.MODEL_PRICING || [];
+const latestBlogs = [
+  {
+    title: "AI Token Pricing 2026: What Changed This Quarter",
+    href: "/blog/ai-token-pricing-2026-quarterly-update",
+    meta: "Pricing Update",
+  },
+  {
+    title: "OpenAI vs Anthropic Token Cost Benchmarks for Production Apps",
+    href: "/blog/openai-vs-anthropic-token-cost-benchmarks",
+    meta: "Comparison",
+  },
+  {
+    title: "How to Cut LLM Spend by 30% with Prompt and Output Controls",
+    href: "/blog/reduce-llm-spend-prompt-output-controls",
+    meta: "Optimization",
+  },
+];
 
 const fields = {
   model: document.getElementById("model"),
@@ -14,6 +31,7 @@ const outputs = {
   costPerRun: document.getElementById("costPerRun"),
   monthlyCost: document.getElementById("monthlyCost"),
   modelNotice: document.getElementById("modelNotice"),
+  blogList: document.getElementById("blogList"),
 };
 
 function usd(value) {
@@ -36,6 +54,18 @@ function fillModels() {
     option.value = String(index);
     option.textContent = `${item.provider} — ${item.model}`;
     fields.model.appendChild(option);
+  });
+}
+
+function renderBlogs() {
+  if (!outputs.blogList) return;
+  outputs.blogList.innerHTML = "";
+
+  latestBlogs.forEach((post) => {
+    const article = document.createElement("article");
+    article.className = "blog-card";
+    article.innerHTML = `<p class="blog-meta">${post.meta}</p><h3><a href="${post.href}">${post.title}</a></h3>`;
+    outputs.blogList.appendChild(article);
   });
 }
 
@@ -71,6 +101,7 @@ function update() {
 }
 
 fillModels();
+renderBlogs();
 update();
 
 Object.values(fields).forEach((field) => {
