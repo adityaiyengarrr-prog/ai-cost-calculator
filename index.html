@@ -3,210 +3,93 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AI Token Cost & ROI Calculator</title>
+    <title>AI Token Cost Calculator</title>
     <meta
       name="description"
-      content="Estimate AI token spend, monthly AI program cost, ROI, payback period, and break-even point with model-aware pricing and growth scenarios."
+      content="Calculate estimated AI model token costs across OpenAI, Anthropic, Gemini, Mistral, DeepSeek, Groq, and more."
     />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&family=JetBrains+Mono:wght@500&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap"
       rel="stylesheet"
     />
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <main class="app">
-      <header class="hero card">
-        <p class="eyebrow">AI Cost Planning</p>
-        <h1>AI Token Cost & ROI Calculator</h1>
+    <main class="wrap">
+      <section class="hero card">
+        <p class="tag">Free • No Sign-up</p>
+        <h1>AI Token Cost Calculator</h1>
         <p>
-          Model your full AI program economics in under 2 minutes. Forecast token spend, platform
-          overhead, savings versus manual operations, and break-even timeline.
+          Estimate input cost, output cost, run-level spend, and monthly spend across major AI
+          providers in seconds.
         </p>
-        <div class="hero-kpis">
-          <article>
-            <p class="kpi-label">Primary Outcome</p>
-            <p class="kpi-value">Annual Savings + ROI</p>
-          </article>
-          <article>
-            <p class="kpi-label">Planning Mode</p>
-            <p class="kpi-value">Base + Conservative + Growth</p>
-          </article>
-          <article>
-            <p class="kpi-label">Built For</p>
-            <p class="kpi-value">Finance, Ops, Product</p>
-          </article>
-        </div>
-      </header>
+      </section>
 
-      <section class="card">
-        <h2>Calculator</h2>
-        <div class="preset-row" role="group" aria-label="Usage presets">
-          <button class="preset" data-preset="chatbot" type="button">Support Chatbot</button>
-          <button class="preset" data-preset="research" type="button">Research Copilot</button>
-          <button class="preset" data-preset="content" type="button">Content Assistant</button>
-          <button class="preset" data-preset="agent" type="button">Agent Workflow</button>
-        </div>
-
-        <div class="input-grid" aria-label="Input controls">
+      <section class="card calculator" aria-label="Calculator">
+        <h2>Token Cost Calculator</h2>
+        <div class="grid">
           <label>
-            Model
+            Provider / Model
             <select id="model"></select>
           </label>
           <label>
-            Monthly Active Users
-            <input id="monthlyUsers" type="number" min="1" value="4000" step="50" />
+            Input Tokens
+            <input id="inputTokens" type="number" min="0" value="1500" step="1" />
           </label>
           <label>
-            Requests Per User / Month
-            <input id="requestsPerUser" type="number" min="1" value="28" step="1" />
+            Output Tokens
+            <input id="outputTokens" type="number" min="0" value="600" step="1" />
           </label>
           <label>
-            Input Tokens Per Request
-            <input id="inputTokens" type="number" min="1" value="1200" step="10" />
+            Runs / Requests
+            <input id="runs" type="number" min="1" value="1000" step="1" />
           </label>
           <label>
-            Output Tokens Per Request
-            <input id="outputTokens" type="number" min="1" value="420" step="10" />
-          </label>
-          <label>
-            Cached Input Share (%)
-            <input id="cacheShare" type="number" min="0" max="100" value="35" step="1" />
-          </label>
-          <label>
-            Overhead Tokens Per Request
-            <input id="overheadTokens" type="number" min="0" value="180" step="10" />
-          </label>
-          <label>
-            Tool Calls Per Request
-            <input id="toolCalls" type="number" min="0" value="1" step="1" />
-          </label>
-          <label>
-            Tokens Per Tool Call
-            <input id="tokensPerToolCall" type="number" min="0" value="140" step="10" />
-          </label>
-          <label>
-            Retry Rate (%)
-            <input id="retryRate" type="number" min="0" max="100" value="7" step="1" />
-          </label>
-          <label>
-            Monthly Platform Fee (USD)
-            <input id="platformFee" type="number" min="0" value="1500" step="50" />
-          </label>
-          <label>
-            Human Review Cost / Month (USD)
-            <input id="reviewCost" type="number" min="0" value="2200" step="50" />
-          </label>
-          <label>
-            One-Time Implementation Cost (USD)
-            <input id="implementation" type="number" min="0" value="12000" step="500" />
-          </label>
-          <label>
-            Human Team Cost / Month (USD)
-            <input id="humanMonthlyCost" type="number" min="0" value="68000" step="500" />
-          </label>
-          <label>
-            12-Month Usage Growth (%)
-            <input id="growthRate" type="number" min="0" max="300" value="40" step="1" />
-          </label>
-          <label>
-            Monthly Revenue Influenced (USD)
-            <input id="monthlyRevenue" type="number" min="0" value="120000" step="1000" />
-          </label>
-          <label>
-            AI Impact on Revenue (%)
-            <input id="revenueLift" type="number" min="0" max="100" value="8" step="1" />
+            Monthly Usage Multiplier (optional)
+            <input id="monthlyMultiplier" type="number" min="0" value="1" step="0.1" />
           </label>
         </div>
-      </section>
 
-      <section class="card metrics" aria-label="Key results">
-        <article><h3>Monthly Requests</h3><p id="monthlyRequests" class="metric">0</p></article>
-        <article><h3>Monthly Token Cost</h3><p id="monthlyTokenCost" class="metric">$0</p></article>
-        <article><h3>Total Monthly AI Cost</h3><p id="monthlyAiCost" class="metric">$0</p></article>
-        <article><h3>Annual AI Cost (Year 1)</h3><p id="annualAiCost" class="metric">$0</p></article>
-        <article><h3>Cost Per Request</h3><p id="costPerRequest" class="metric">$0</p></article>
-        <article><h3>Cost Per User / Month</h3><p id="costPerUser" class="metric">$0</p></article>
-        <article><h3>Annual Savings vs Human Team</h3><p id="annualSavings" class="metric positive">$0</p></article>
-        <article><h3>ROI (Year 1)</h3><p id="roi" class="metric">0%</p></article>
-      </section>
+        <p id="modelNotice" class="notice" aria-live="polite"></p>
 
-      <section class="card metrics scenario-band" aria-label="Scenario range">
-        <article><h3>Conservative Annual Cost</h3><p id="conservativeAnnual" class="metric">$0</p></article>
-        <article><h3>Base Annual Cost</h3><p id="baseAnnual" class="metric">$0</p></article>
-        <article><h3>Growth Annual Cost</h3><p id="growthAnnual" class="metric">$0</p></article>
-        <article><h3>Break-Even Requests / Day</h3><p id="breakEvenDaily" class="metric">0</p></article>
-      </section>
-
-      <section class="card metrics" aria-label="Token and unit economics">
-        <article><h3>Monthly Input Tokens</h3><p id="monthlyInputTokens" class="metric">0</p></article>
-        <article><h3>Monthly Output Tokens</h3><p id="monthlyOutputTokens" class="metric">0</p></article>
-        <article><h3>Monthly Cached Tokens</h3><p id="monthlyCachedTokens" class="metric">0</p></article>
-        <article><h3>Payback Period</h3><p id="payback" class="metric">0 months</p></article>
-      </section>
-
-      <section class="card decision-card">
-        <h2 class="recommendation-headline" id="recommendationHeadline">Decision signal loading...</h2>
-        <p class="recommendation-body" id="recommendationBody"></p>
-      </section>
-
-      <section class="card analytics" aria-label="Comparison chart">
-        <h2>AI vs Human Annual Cost</h2>
-        <div class="bars">
-          <div>
-            <span>Human Team</span>
-            <div class="bar-track"><div id="humanBar" class="bar employee"></div></div>
-          </div>
-          <div>
-            <span>AI Program</span>
-            <div class="bar-track"><div id="aiBar" class="bar ai"></div></div>
-          </div>
-          <div>
-            <span>Savings Gap</span>
-            <div class="bar-track"><div id="savingsBar" class="bar savings"></div></div>
-          </div>
+        <div class="results" aria-label="Results">
+          <article><h3>Estimated Input Token Cost</h3><p id="inputCost">$0.00</p></article>
+          <article><h3>Estimated Output Token Cost</h3><p id="outputCost">$0.00</p></article>
+          <article><h3>Total Cost Per Run</h3><p id="costPerRun">$0.00</p></article>
+          <article><h3>Estimated Monthly Cost</h3><p id="monthlyCost">$0.00</p></article>
         </div>
-        <p id="insight" class="insight"></p>
+
+        <p class="disclaimer">
+          Prices are estimates based on publicly available pricing and may change. Always verify
+          with the provider before making business decisions.
+        </p>
       </section>
 
-      <section class="card assumptions">
-        <h2>Assumptions & Method</h2>
+      <section class="card">
+        <h2>Token Basics</h2>
         <ul>
-          <li>Total monthly requests = monthly users × requests per user.</li>
-          <li>Billable input tokens include prompts, overhead, and tool-call tokens.</li>
-          <li>Cached input share is charged at cached-input pricing when supported by model.</li>
-          <li>Total AI cost includes token spend, platform fees, and human review.</li>
-          <li>Year-1 cost includes one-time implementation.</li>
-          <li>ROI includes both labor savings and modeled revenue lift.</li>
+          <li>Input tokens are prompt/context tokens sent to the model.</li>
+          <li>Output tokens are generated response tokens from the model.</li>
+          <li>Total spend depends on both token volumes and provider/model rates.</li>
         </ul>
       </section>
 
-      <section class="card section-grid">
+      <section class="card split">
         <article>
           <h2>AI vs Traditional</h2>
-          <ul>
-            <li>Human teams scale mostly linearly with volume.</li>
-            <li>AI spend scales by tokens and can be optimized via caching and prompt design.</li>
-            <li>Token-level tracking surfaces cost drivers earlier than invoice-level review.</li>
-          </ul>
+          <p>
+            Traditional workflows scale with labor hours; AI-heavy workflows scale with token usage.
+            This calculator helps teams forecast variable cost as usage grows.
+          </p>
         </article>
         <article>
           <h2>Use Cases</h2>
           <ul>
-            <li>Support copilots</li>
-            <li>Sales and research assistants</li>
-            <li>Internal knowledge agents</li>
-            <li>Content generation workflows</li>
-          </ul>
-        </article>
-        <article>
-          <h2>How To Outperform</h2>
-          <ul>
-            <li>Reduce retries using stronger prompt guardrails and validation.</li>
-            <li>Shift repetitive context to cacheable blocks.</li>
-            <li>Limit output length by response templates and strict completion budgets.</li>
+            <li>Vibe coding and indie hacking tools</li>
+            <li>Support copilots and agent workflows</li>
+            <li>Content, research, and internal assistants</li>
           </ul>
         </article>
       </section>
@@ -214,29 +97,33 @@
       <section class="card faq">
         <h2>FAQ</h2>
         <details>
-          <summary>How many tokens does one request use?</summary>
-          <p>Sum input prompt tokens, overhead/tool tokens, and output tokens for each request.</p>
+          <summary>Is this an exact invoice prediction?</summary>
+          <p>No. It is a directional estimate and should be validated against provider billing.</p>
         </details>
         <details>
-          <summary>What causes AI cost spikes?</summary>
-          <p>Request growth, longer prompts, larger outputs, retries, and extra tool calls.</p>
+          <summary>Why are some models marked for verification?</summary>
+          <p>
+            Some providers/models did not have a clear public token price at implementation time.
+            Those entries are intentionally flagged instead of guessed.
+          </p>
         </details>
         <details>
-          <summary>How can I improve ROI fastest?</summary>
-          <p>Reduce retries, increase cache hit rate, and cap output length on low-value workflows.</p>
+          <summary>How do I reduce cost quickly?</summary>
+          <p>Lower prompt size, cap output length, cache repeated context, and choose a lower-cost model.</p>
         </details>
       </section>
 
       <section class="card links">
-        <h2>Related Calculators</h2>
+        <h2>Related Tools</h2>
         <ul>
-          <li><a href="#model">LLM API Pricing Calculator</a></li>
-          <li><a href="#model">AI Support ROI Calculator</a></li>
-          <li><a href="#model">AI Agent Cost Forecast Calculator</a></li>
+          <li><a href="#">AI ROI Calculator</a></li>
+          <li><a href="#">LLM API Pricing Tracker</a></li>
+          <li><a href="#">AI Agent Cost Forecast</a></li>
         </ul>
       </section>
     </main>
 
+    <script src="model-pricing.js"></script>
     <script src="script.js"></script>
   </body>
 </html>
