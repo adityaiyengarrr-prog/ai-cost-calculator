@@ -3,10 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AI vs Employee Cost Calculator</title>
+    <title>AI Token Cost Calculator</title>
     <meta
       name="description"
-      content="Estimate annual savings, payback period, and break-even timeline with a transparent AI vs employee TCO calculator."
+      content="Estimate AI token spend by model, request volume, prompt/output size, and cache hit rate. Compare AI spend vs human-team cost in seconds."
     />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -19,289 +19,178 @@
   <body>
     <main class="app">
       <header class="hero card">
-        <p class="eyebrow">CFO Decision Tool</p>
-        <h1>AI vs Employee Cost Calculator</h1>
+        <p class="eyebrow">AI Cost Planning</p>
+        <h1>AI Token Cost Calculator</h1>
         <p>
-          Model fully loaded employee cost against AI stack spend and implementation effort.
-          Get annual delta, payback period, and break-even month in seconds.
+          Estimate monthly and annual token spend with model-aware pricing, caching assumptions,
+          and usage growth scenarios. See cost per request, per user, and AI vs employee cost.
         </p>
         <div class="hero-kpis">
           <article>
-            <p class="kpi-label">Decision Speed</p>
-            <p class="kpi-value">Under 2 Minutes</p>
+            <p class="kpi-label">Best For</p>
+            <p class="kpi-value">PM + Finance Teams</p>
           </article>
           <article>
-            <p class="kpi-label">View Mode</p>
+            <p class="kpi-label">Decision Mode</p>
             <p class="kpi-value">Base + Range</p>
           </article>
           <article>
-            <p class="kpi-label">Output Focus</p>
-            <p class="kpi-value">Savings + Payback</p>
+            <p class="kpi-label">Primary Output</p>
+            <p class="kpi-value">Token Spend + ROI</p>
           </article>
         </div>
-        <p class="hero-mini">
-          Includes conservative, base, and upside scenarios so finance teams can evaluate
-          uncertainty before committing budget.
-        </p>
       </header>
 
       <section class="card">
         <h2>Calculator</h2>
-        <div class="preset-row" role="group" aria-label="Department presets">
-          <button class="preset" data-preset="support" type="button">Support</button>
-          <button class="preset" data-preset="sdr" type="button">SDR</button>
-          <button class="preset" data-preset="backoffice" type="button">Back Office</button>
-          <button class="preset" data-preset="content" type="button">Content</button>
+        <div class="preset-row" role="group" aria-label="Usage presets">
+          <button class="preset" data-preset="chatbot" type="button">Support Chatbot</button>
+          <button class="preset" data-preset="research" type="button">Research Copilot</button>
+          <button class="preset" data-preset="content" type="button">Content Assistant</button>
+          <button class="preset" data-preset="agent" type="button">Agent Workflow</button>
         </div>
 
         <div class="input-grid" aria-label="Input controls">
           <label>
-            Team Size
-            <input id="teamSize" type="number" min="1" value="8" />
+            Model
+            <select id="model"></select>
           </label>
           <label>
-            Monthly Salary Per Employee (USD)
-            <input id="salary" type="number" min="0" value="6200" step="100" />
+            Monthly Active Users
+            <input id="monthlyUsers" type="number" min="1" value="4000" step="50" />
           </label>
           <label>
-            Employee Burden Rate (%)
-            <input id="burden" type="number" min="0" max="200" value="28" step="1" />
+            Requests Per User / Month
+            <input id="requestsPerUser" type="number" min="1" value="28" step="1" />
           </label>
           <label>
-            Attrition / Backfill Cost (%)
-            <input id="attrition" type="number" min="0" max="100" value="12" step="1" />
+            Input Tokens Per Request
+            <input id="inputTokens" type="number" min="1" value="1200" step="10" />
           </label>
           <label>
-            QA & Management Overhead (%)
-            <input id="management" type="number" min="0" max="100" value="15" step="1" />
+            Output Tokens Per Request
+            <input id="outputTokens" type="number" min="1" value="420" step="10" />
           </label>
           <label>
-            AI Monthly Platform Cost (USD)
-            <input id="aiPlatform" type="number" min="0" value="7800" step="100" />
+            Cached Input Share (%)
+            <input id="cacheShare" type="number" min="0" max="100" value="35" step="1" />
           </label>
           <label>
-            AI Monthly Usage Cost (USD)
-            <input id="aiUsage" type="number" min="0" value="3400" step="50" />
+            Overhead Tokens Per Request
+            <input id="overheadTokens" type="number" min="0" value="180" step="10" />
           </label>
           <label>
-            Human-in-the-Loop Cost (USD/mo)
-            <input id="hitl" type="number" min="0" value="2200" step="50" />
+            Tool Calls Per Request
+            <input id="toolCalls" type="number" min="0" value="1" step="1" />
+          </label>
+          <label>
+            Tokens Per Tool Call
+            <input id="tokensPerToolCall" type="number" min="0" value="140" step="10" />
+          </label>
+          <label>
+            Retry Rate (%)
+            <input id="retryRate" type="number" min="0" max="100" value="7" step="1" />
+          </label>
+          <label>
+            Monthly Platform Fee (USD)
+            <input id="platformFee" type="number" min="0" value="1500" step="50" />
+          </label>
+          <label>
+            Human Review Cost / Month (USD)
+            <input id="reviewCost" type="number" min="0" value="2200" step="50" />
           </label>
           <label>
             One-Time Implementation Cost (USD)
-            <input id="implementation" type="number" min="0" value="22000" step="500" />
+            <input id="implementation" type="number" min="0" value="12000" step="500" />
           </label>
           <label>
-            Automation Suitability (%)
-            <input id="automation" type="number" min="0" max="100" value="62" step="1" />
+            Human Team Cost / Month (USD)
+            <input id="humanMonthlyCost" type="number" min="0" value="68000" step="500" />
           </label>
           <label>
-            AI Productivity Lift on Remaining Work (%)
-            <input id="lift" type="number" min="0" max="100" value="28" step="1" />
-          </label>
-          <label>
-            Rework / Error Rate Penalty (%)
-            <input id="rework" type="number" min="0" max="100" value="8" step="1" />
-          </label>
-          <label>
-            Monthly Task Volume
-            <input id="monthlyVolume" type="number" min="1" value="24000" step="100" />
-          </label>
-          <label>
-            Avg Handling Time Per Task (minutes)
-            <input id="minutesPerTask" type="number" min="0.1" value="6" step="0.1" />
-          </label>
-          <label>
-            Geography Cost Multiplier (%)
-            <input id="geoMultiplier" type="number" min="50" max="250" value="100" step="1" />
-          </label>
-          <label>
-            AI Maintenance Hours / Month
-            <input id="maintenanceHours" type="number" min="0" value="24" step="1" />
-          </label>
-          <label>
-            Blended AI Ops Rate (USD/hr)
-            <input id="maintenanceRate" type="number" min="0" value="95" step="1" />
+            12-Month Usage Growth (%)
+            <input id="growthRate" type="number" min="0" max="300" value="40" step="1" />
           </label>
         </div>
       </section>
 
       <section class="card metrics" aria-label="Key results">
-        <article>
-          <h3>Annual Employee TCO</h3>
-          <p id="employeeAnnual" class="metric">$0</p>
-        </article>
-        <article>
-          <h3>Annual AI Program Cost</h3>
-          <p id="aiAnnual" class="metric">$0</p>
-        </article>
-        <article>
-          <h3>Annual Net Savings</h3>
-          <p id="annualSavings" class="metric positive">$0</p>
-        </article>
-        <article>
-          <h3>Payback Period</h3>
-          <p id="payback" class="metric">0 months</p>
-        </article>
-        <article>
-          <h3>Break-even Month</h3>
-          <p id="breakEven" class="metric">Month 0</p>
-        </article>
-        <article>
-          <h3>Year-1 ROI</h3>
-          <p id="roi" class="metric">0%</p>
-        </article>
-        <article>
-          <h3>Effective Capacity Gain</h3>
-          <p id="capacity" class="metric">0%</p>
-        </article>
-      </section>
-
-      <section class="card metrics" aria-label="Board-level impact">
-        <article>
-          <h3>Monthly Net Savings</h3>
-          <p id="monthlySavings" class="metric">$0</p>
-        </article>
-        <article>
-          <h3>3-Year Net Benefit</h3>
-          <p id="threeYearBenefit" class="metric">$0</p>
-        </article>
-        <article>
-          <h3>Confidence Score</h3>
-          <p id="confidenceScore" class="metric">0/100</p>
-        </article>
-        <article>
-          <h3>AI Cost Per Minute</h3>
-          <p id="aiCostPerMinute" class="metric">$0</p>
-        </article>
-        <article>
-          <h3>Year-2 Annual Savings</h3>
-          <p id="yearTwoSavings" class="metric">$0</p>
-        </article>
-        <article>
-          <h3>Annual Hours Reclaimed</h3>
-          <p id="hoursReclaimed" class="metric">0 hrs</p>
-        </article>
-        <article>
-          <h3>Value of Capacity Reclaimed</h3>
-          <p id="capacityValue" class="metric">$0</p>
-        </article>
+        <article><h3>Monthly Requests</h3><p id="monthlyRequests" class="metric">0</p></article>
+        <article><h3>Monthly Token Cost</h3><p id="monthlyTokenCost" class="metric">$0</p></article>
+        <article><h3>Total Monthly AI Cost</h3><p id="monthlyAiCost" class="metric">$0</p></article>
+        <article><h3>Annual AI Cost (Year 1)</h3><p id="annualAiCost" class="metric">$0</p></article>
+        <article><h3>Cost Per Request</h3><p id="costPerRequest" class="metric">$0</p></article>
+        <article><h3>Cost Per User / Month</h3><p id="costPerUser" class="metric">$0</p></article>
+        <article><h3>Annual Savings vs Human Team</h3><p id="annualSavings" class="metric positive">$0</p></article>
       </section>
 
       <section class="card metrics scenario-band" aria-label="Scenario range">
-        <article>
-          <h3>Conservative Savings (Annual)</h3>
-          <p id="conservativeSavings" class="metric">$0</p>
-        </article>
-        <article>
-          <h3>Base Savings (Annual)</h3>
-          <p id="baseSavings" class="metric">$0</p>
-        </article>
-        <article>
-          <h3>Upside Savings (Annual)</h3>
-          <p id="upsideSavings" class="metric">$0</p>
-        </article>
+        <article><h3>Conservative Annual Cost</h3><p id="conservativeAnnual" class="metric">$0</p></article>
+        <article><h3>Base Annual Cost</h3><p id="baseAnnual" class="metric">$0</p></article>
+        <article><h3>Growth Annual Cost</h3><p id="growthAnnual" class="metric">$0</p></article>
       </section>
 
-      <section class="card metrics" aria-label="Risk and sensitivity">
-        <article>
-          <h3>Min Automation To Break Even</h3>
-          <p id="requiredAutomation" class="metric">0%</p>
-        </article>
-        <article>
-          <h3>Max AI Monthly Spend To Break Even</h3>
-          <p id="maxAiMonthly" class="metric">$0</p>
-        </article>
-        <article>
-          <h3>Risk Flag</h3>
-          <p id="riskFlag" class="metric">Stable</p>
-        </article>
-        <article>
-          <h3>Break-even Volume (Tasks/Month)</h3>
-          <p id="breakEvenVolume" class="metric">0</p>
-        </article>
-      </section>
-
-      <section class="card metrics" aria-label="Unit economics">
-        <article>
-          <h3>Human Cost Per Task</h3>
-          <p id="humanCostPerTask" class="metric">$0</p>
-        </article>
-        <article>
-          <h3>AI Program Cost Per Task</h3>
-          <p id="aiCostPerTask" class="metric">$0</p>
-        </article>
+      <section class="card metrics" aria-label="Token and unit economics">
+        <article><h3>Monthly Input Tokens</h3><p id="monthlyInputTokens" class="metric">0</p></article>
+        <article><h3>Monthly Output Tokens</h3><p id="monthlyOutputTokens" class="metric">0</p></article>
+        <article><h3>Monthly Cached Tokens</h3><p id="monthlyCachedTokens" class="metric">0</p></article>
+        <article><h3>Payback Period</h3><p id="payback" class="metric">0 months</p></article>
       </section>
 
       <section class="card analytics" aria-label="Comparison chart">
-        <h2>Cost Comparison</h2>
+        <h2>AI vs Human Annual Cost</h2>
         <div class="bars">
           <div>
-            <span>Employee TCO</span>
-            <div class="bar-track"><div id="employeeBar" class="bar employee"></div></div>
+            <span>Human Team</span>
+            <div class="bar-track"><div id="humanBar" class="bar employee"></div></div>
           </div>
           <div>
-            <span>AI Program Cost</span>
+            <span>AI Program</span>
             <div class="bar-track"><div id="aiBar" class="bar ai"></div></div>
           </div>
           <div>
-            <span>Net Savings</span>
+            <span>Savings Gap</span>
             <div class="bar-track"><div id="savingsBar" class="bar savings"></div></div>
           </div>
         </div>
         <p id="insight" class="insight"></p>
       </section>
 
-      <section class="card decision-card" aria-label="Executive recommendation">
-        <h2>Executive Recommendation</h2>
-        <p id="recommendationHeadline" class="recommendation-headline">Run the base scenario.</p>
-        <p id="recommendationBody" class="recommendation-body">
-          This section summarizes the financial case and suggested next step.
-        </p>
-        <p id="executionPlan" class="recommendation-body">
-          Suggested rollout sequence appears here after inputs are calculated.
-        </p>
-      </section>
-
       <section class="card assumptions">
-        <h2>Assumptions & Methodology</h2>
+        <h2>Assumptions & Method</h2>
         <ul>
-          <li>Employee TCO includes salary, burden, attrition, and management/QA overhead.</li>
-          <li>AI cost includes platform + usage + human-in-the-loop + one-time implementation.</li>
-          <li>Residual labor is the non-automated workload adjusted by productivity lift and rework.</li>
-          <li>Geography multiplier adjusts salary baseline for local market differences.</li>
-          <li>AI maintenance hours add recurring ops and optimization effort.</li>
-          <li>Scenario range adjusts automation, rework, and AI usage to reflect uncertainty.</li>
-          <li>Year-1 ROI is calculated as annual net savings divided by total Year-1 AI program cost.</li>
-          <li>Confidence score increases when payback is fast and downside scenario remains positive.</li>
+          <li>Total monthly requests = monthly users × requests per user.</li>
+          <li>Billable input tokens include prompts, overhead, and tool-call tokens.</li>
+          <li>Cached input share is charged at cached-input pricing when supported by model.</li>
+          <li>Total AI cost includes token spend, platform fees, and human review.</li>
+          <li>Year-1 cost includes one-time implementation.</li>
         </ul>
       </section>
 
       <section class="card section-grid">
         <article>
-          <h2>AI vs Traditional Team Model</h2>
+          <h2>AI vs Traditional</h2>
           <ul>
-            <li>Traditional model scales linearly with headcount and overhead.</li>
-            <li>AI model front-loads implementation, then scales with volume.</li>
-            <li>Best outcomes come from AI + human review on high-risk tasks.</li>
+            <li>Human teams scale mostly linearly with volume.</li>
+            <li>AI spend scales by tokens and can be optimized with cache and prompt quality.</li>
+            <li>Token-level measurement gives earlier cost control than monthly invoices alone.</li>
           </ul>
         </article>
         <article>
-          <h2>Common Use Cases</h2>
+          <h2>Use Cases</h2>
           <ul>
-            <li>Customer support deflection and ticket triage</li>
-            <li>Sales development outbound personalization</li>
-            <li>Back-office document and workflow processing</li>
-            <li>Content drafting and repurposing</li>
+            <li>Support copilots</li>
+            <li>Sales and research assistants</li>
+            <li>Internal knowledge agents</li>
+            <li>Content generation workflows</li>
           </ul>
         </article>
         <article>
-          <h2>Why This Calculator Outperforms Generic Tools</h2>
+          <h2>Why This Tool</h2>
           <ul>
-            <li>Includes fully loaded labor components beyond base salary.</li>
-            <li>Separates AI platform, usage, and human-in-the-loop cost centers.</li>
-            <li>Shows downside/base/upside ranges for planning confidence.</li>
-            <li>Adds unit economics to connect ROI to real operational volume.</li>
+            <li>Model-based token pricing (input/output/cached).</li>
+            <li>Retry and tool-call overhead included.</li>
+            <li>Base + conservative + growth scenarios for planning.</li>
           </ul>
         </article>
       </section>
@@ -309,57 +198,26 @@
       <section class="card faq">
         <h2>FAQ</h2>
         <details>
-          <summary>Is AI more expensive than humans?</summary>
-          <p>
-            It depends on volume, quality requirements, and implementation cost. At higher
-            repeatable volumes, AI often reduces cost per unit.
-          </p>
+          <summary>How many tokens does one request use?</summary>
+          <p>Sum input prompt tokens, overhead/tool tokens, and output tokens for each request.</p>
         </details>
         <details>
-          <summary>How much does it actually cost to use AI?</summary>
-          <p>
-            Typical cost includes platform fees, usage fees, monitoring, and human oversight.
-            This calculator separates each line item.
-          </p>
+          <summary>Why is cached input cheaper?</summary>
+          <p>Some providers discount repeated context tokens when cached and reused.</p>
         </details>
         <details>
-          <summary>How much does AI cost per minute?</summary>
-          <p>
-            Per-minute cost depends on token/model usage, workflow complexity, and review rates.
-            Convert monthly usage into unit economics for your team volume.
-          </p>
-        </details>
-        <details>
-          <summary>What is the average cost of AI?</summary>
-          <p>
-            There is no single average. Costs vary by task type, model selection, and the level
-            of human quality control you require.
-          </p>
+          <summary>What drives AI cost spikes?</summary>
+          <p>Request growth, longer prompts, more output tokens, retries, and tool-call expansion.</p>
         </details>
       </section>
 
       <section class="card links">
         <h2>Related Calculators</h2>
         <ul>
-          <li><a href="#teamSize">AI Customer Support ROI Calculator</a></li>
-          <li><a href="#teamSize">AI SDR Productivity Calculator</a></li>
-          <li><a href="#teamSize">AI Content Team Cost Calculator</a></li>
+          <li><a href="#model">LLM API Pricing Calculator</a></li>
+          <li><a href="#model">AI Support ROI Calculator</a></li>
+          <li><a href="#model">AI Agent Cost Forecast Calculator</a></li>
         </ul>
-      </section>
-
-      <section class="card cta">
-        <h2>Next Step</h2>
-        <p>
-          Use these outputs to prepare a board-ready decision memo with best-case and base-case
-          assumptions.
-        </p>
-        <a href="#insight" aria-label="Review AI ROI summary">Review ROI Summary</a>
-        <a class="secondary-link" href="#teamSize" aria-label="Jump to calculator inputs">
-          Adjust Inputs
-        </a>
-        <a class="secondary-link" href="#" aria-label="Download CFO memo template">
-          Download CFO Memo Template
-        </a>
       </section>
     </main>
 

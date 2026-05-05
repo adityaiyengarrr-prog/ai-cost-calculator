@@ -1,138 +1,126 @@
+const modelCatalog = {
+  "gpt-5-mini": { label: "GPT-5 Mini", inputPerM: 0.25, outputPerM: 2.0, cachedInputPerM: 0.025 },
+  "gpt-5": { label: "GPT-5", inputPerM: 1.25, outputPerM: 10.0, cachedInputPerM: 0.125 },
+  "gpt-5-pro": { label: "GPT-5 Pro", inputPerM: 15.0, outputPerM: 120.0, cachedInputPerM: 0.0 },
+};
+
+const presets = {
+  chatbot: {
+    model: "gpt-5-mini",
+    monthlyUsers: 12000,
+    requestsPerUser: 14,
+    inputTokens: 700,
+    outputTokens: 260,
+    cacheShare: 40,
+    overheadTokens: 120,
+    toolCalls: 1,
+    tokensPerToolCall: 90,
+    retryRate: 6,
+    platformFee: 1100,
+    reviewCost: 1800,
+    implementation: 9000,
+    humanMonthlyCost: 82000,
+    growthRate: 35,
+  },
+  research: {
+    model: "gpt-5",
+    monthlyUsers: 2400,
+    requestsPerUser: 35,
+    inputTokens: 2400,
+    outputTokens: 900,
+    cacheShare: 28,
+    overheadTokens: 300,
+    toolCalls: 2,
+    tokensPerToolCall: 220,
+    retryRate: 9,
+    platformFee: 2100,
+    reviewCost: 3400,
+    implementation: 18000,
+    humanMonthlyCost: 94000,
+    growthRate: 45,
+  },
+  content: {
+    model: "gpt-5-mini",
+    monthlyUsers: 3800,
+    requestsPerUser: 24,
+    inputTokens: 1300,
+    outputTokens: 1100,
+    cacheShare: 22,
+    overheadTokens: 180,
+    toolCalls: 1,
+    tokensPerToolCall: 140,
+    retryRate: 8,
+    platformFee: 1600,
+    reviewCost: 2800,
+    implementation: 12000,
+    humanMonthlyCost: 76000,
+    growthRate: 40,
+  },
+  agent: {
+    model: "gpt-5",
+    monthlyUsers: 800,
+    requestsPerUser: 120,
+    inputTokens: 3000,
+    outputTokens: 1300,
+    cacheShare: 48,
+    overheadTokens: 420,
+    toolCalls: 4,
+    tokensPerToolCall: 260,
+    retryRate: 12,
+    platformFee: 4200,
+    reviewCost: 5400,
+    implementation: 26000,
+    humanMonthlyCost: 136000,
+    growthRate: 60,
+  },
+};
+
 const fields = {
-  teamSize: document.getElementById("teamSize"),
-  salary: document.getElementById("salary"),
-  burden: document.getElementById("burden"),
-  attrition: document.getElementById("attrition"),
-  management: document.getElementById("management"),
-  aiPlatform: document.getElementById("aiPlatform"),
-  aiUsage: document.getElementById("aiUsage"),
-  hitl: document.getElementById("hitl"),
+  model: document.getElementById("model"),
+  monthlyUsers: document.getElementById("monthlyUsers"),
+  requestsPerUser: document.getElementById("requestsPerUser"),
+  inputTokens: document.getElementById("inputTokens"),
+  outputTokens: document.getElementById("outputTokens"),
+  cacheShare: document.getElementById("cacheShare"),
+  overheadTokens: document.getElementById("overheadTokens"),
+  toolCalls: document.getElementById("toolCalls"),
+  tokensPerToolCall: document.getElementById("tokensPerToolCall"),
+  retryRate: document.getElementById("retryRate"),
+  platformFee: document.getElementById("platformFee"),
+  reviewCost: document.getElementById("reviewCost"),
   implementation: document.getElementById("implementation"),
-  automation: document.getElementById("automation"),
-  lift: document.getElementById("lift"),
-  rework: document.getElementById("rework"),
-  monthlyVolume: document.getElementById("monthlyVolume"),
-  minutesPerTask: document.getElementById("minutesPerTask"),
-  geoMultiplier: document.getElementById("geoMultiplier"),
-  maintenanceHours: document.getElementById("maintenanceHours"),
-  maintenanceRate: document.getElementById("maintenanceRate"),
+  humanMonthlyCost: document.getElementById("humanMonthlyCost"),
+  growthRate: document.getElementById("growthRate"),
 };
 
 const outputs = {
-  employeeAnnual: document.getElementById("employeeAnnual"),
-  aiAnnual: document.getElementById("aiAnnual"),
+  monthlyRequests: document.getElementById("monthlyRequests"),
+  monthlyTokenCost: document.getElementById("monthlyTokenCost"),
+  monthlyAiCost: document.getElementById("monthlyAiCost"),
+  annualAiCost: document.getElementById("annualAiCost"),
+  costPerRequest: document.getElementById("costPerRequest"),
+  costPerUser: document.getElementById("costPerUser"),
   annualSavings: document.getElementById("annualSavings"),
+  conservativeAnnual: document.getElementById("conservativeAnnual"),
+  baseAnnual: document.getElementById("baseAnnual"),
+  growthAnnual: document.getElementById("growthAnnual"),
+  monthlyInputTokens: document.getElementById("monthlyInputTokens"),
+  monthlyOutputTokens: document.getElementById("monthlyOutputTokens"),
+  monthlyCachedTokens: document.getElementById("monthlyCachedTokens"),
   payback: document.getElementById("payback"),
-  breakEven: document.getElementById("breakEven"),
-  roi: document.getElementById("roi"),
-  capacity: document.getElementById("capacity"),
-  monthlySavings: document.getElementById("monthlySavings"),
-  threeYearBenefit: document.getElementById("threeYearBenefit"),
-  conservativeSavings: document.getElementById("conservativeSavings"),
-  baseSavings: document.getElementById("baseSavings"),
-  upsideSavings: document.getElementById("upsideSavings"),
-  confidenceScore: document.getElementById("confidenceScore"),
-  requiredAutomation: document.getElementById("requiredAutomation"),
-  maxAiMonthly: document.getElementById("maxAiMonthly"),
-  riskFlag: document.getElementById("riskFlag"),
-  breakEvenVolume: document.getElementById("breakEvenVolume"),
-  humanCostPerTask: document.getElementById("humanCostPerTask"),
-  aiCostPerTask: document.getElementById("aiCostPerTask"),
-  aiCostPerMinute: document.getElementById("aiCostPerMinute"),
-  yearTwoSavings: document.getElementById("yearTwoSavings"),
-  hoursReclaimed: document.getElementById("hoursReclaimed"),
-  capacityValue: document.getElementById("capacityValue"),
-  recommendationHeadline: document.getElementById("recommendationHeadline"),
-  recommendationBody: document.getElementById("recommendationBody"),
-  executionPlan: document.getElementById("executionPlan"),
-  employeeBar: document.getElementById("employeeBar"),
+  humanBar: document.getElementById("humanBar"),
   aiBar: document.getElementById("aiBar"),
   savingsBar: document.getElementById("savingsBar"),
   insight: document.getElementById("insight"),
 };
 
-const presets = {
-  support: {
-    teamSize: 12,
-    salary: 4800,
-    burden: 30,
-    attrition: 15,
-    management: 18,
-    aiPlatform: 7600,
-    aiUsage: 4200,
-    hitl: 3200,
-    implementation: 26000,
-    automation: 68,
-    lift: 26,
-    rework: 10,
-    monthlyVolume: 42000,
-    minutesPerTask: 7,
-    geoMultiplier: 100,
-    maintenanceHours: 30,
-    maintenanceRate: 95,
-  },
-  sdr: {
-    teamSize: 8,
-    salary: 6500,
-    burden: 28,
-    attrition: 12,
-    management: 14,
-    aiPlatform: 6500,
-    aiUsage: 3000,
-    hitl: 2100,
-    implementation: 22000,
-    automation: 55,
-    lift: 30,
-    rework: 8,
-    monthlyVolume: 16000,
-    minutesPerTask: 5,
-    geoMultiplier: 102,
-    maintenanceHours: 20,
-    maintenanceRate: 95,
-  },
-  backoffice: {
-    teamSize: 10,
-    salary: 5200,
-    burden: 27,
-    attrition: 10,
-    management: 13,
-    aiPlatform: 8200,
-    aiUsage: 3600,
-    hitl: 2800,
-    implementation: 24000,
-    automation: 60,
-    lift: 24,
-    rework: 7,
-    monthlyVolume: 22000,
-    minutesPerTask: 6.5,
-    geoMultiplier: 98,
-    maintenanceHours: 24,
-    maintenanceRate: 90,
-  },
-  content: {
-    teamSize: 6,
-    salary: 6000,
-    burden: 26,
-    attrition: 9,
-    management: 12,
-    aiPlatform: 4800,
-    aiUsage: 2400,
-    hitl: 1700,
-    implementation: 18000,
-    automation: 52,
-    lift: 34,
-    rework: 11,
-    monthlyVolume: 12000,
-    minutesPerTask: 8,
-    geoMultiplier: 96,
-    maintenanceHours: 18,
-    maintenanceRate: 85,
-  },
-};
-
 function safeNumber(value, fallback = 0) {
   const number = Number(value);
   return Number.isFinite(number) ? number : fallback;
+}
+
+function clamp(value, min, max) {
+  return Math.max(min, Math.min(max, value));
 }
 
 function money(value) {
@@ -147,75 +135,48 @@ function moneyPrecise(value) {
   return new Intl.NumberFormat("en-US", {
     style: "currency",
     currency: "USD",
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
+    minimumFractionDigits: 4,
+    maximumFractionDigits: 4,
   }).format(value);
 }
 
-function clamp(value, min, max) {
-  return Math.max(min, Math.min(max, value));
+function fillModelSelect() {
+  Object.entries(modelCatalog).forEach(([key, details]) => {
+    const option = document.createElement("option");
+    option.value = key;
+    option.textContent = `${details.label} (in ${details.inputPerM}/M, out ${details.outputPerM}/M)`;
+    fields.model.appendChild(option);
+  });
 }
 
-function calculateAnnualSavings(inputs) {
-  const baseMonthlyLabor = inputs.teamSize * inputs.salary * inputs.geoMultiplier;
-  const fullyLoadedMonthlyLabor =
-    baseMonthlyLabor * (1 + inputs.burden + inputs.attrition + inputs.management);
-  const annualEmployeeTco = fullyLoadedMonthlyLabor * 12;
+function estimateAnnualCost(inputs, usageMultiplier = 1) {
+  const model = modelCatalog[inputs.model];
+  const monthlyRequests = inputs.monthlyUsers * inputs.requestsPerUser * usageMultiplier;
+  const perRequestInput = inputs.inputTokens + inputs.overheadTokens + inputs.toolCalls * inputs.tokensPerToolCall;
+  const retryMultiplier = 1 + inputs.retryRate;
 
-  const monthlyAiProgram =
-    inputs.aiPlatform + inputs.aiUsage + inputs.hitl + inputs.maintenanceHours * inputs.maintenanceRate;
-  const annualAiProgram = monthlyAiProgram * 12 + inputs.implementation;
+  const grossMonthlyInputTokens = monthlyRequests * perRequestInput * retryMultiplier;
+  const monthlyOutputTokens = monthlyRequests * inputs.outputTokens * retryMultiplier;
+  const monthlyCachedTokens = grossMonthlyInputTokens * inputs.cacheShare;
+  const monthlyNonCachedInputTokens = grossMonthlyInputTokens - monthlyCachedTokens;
 
-  const residualWorkFactor = 1 - inputs.automation;
-  const qualityPenaltyFactor = 1 + inputs.rework;
-  const productivityFactor = 1 + inputs.lift;
+  const inputCost = (monthlyNonCachedInputTokens / 1_000_000) * model.inputPerM;
+  const outputCost = (monthlyOutputTokens / 1_000_000) * model.outputPerM;
+  const cachedCost = (monthlyCachedTokens / 1_000_000) * model.cachedInputPerM;
 
-  const adjustedAiEquivalentLaborCost =
-    (fullyLoadedMonthlyLabor * residualWorkFactor * qualityPenaltyFactor) / productivityFactor;
-  const aiProgramWithResidualLabor = annualAiProgram + adjustedAiEquivalentLaborCost * 12;
+  const monthlyTokenCost = inputCost + outputCost + cachedCost;
+  const monthlyAiCost = monthlyTokenCost + inputs.platformFee + inputs.reviewCost;
+  const annualAiCost = monthlyAiCost * 12 + inputs.implementation;
 
   return {
-    annualEmployeeTco,
-    aiProgramWithResidualLabor,
-    annualSavings: annualEmployeeTco - aiProgramWithResidualLabor,
-    monthlyAiProgram,
-    fullyLoadedMonthlyLabor,
-    adjustedAiEquivalentLaborCost,
+    monthlyRequests,
+    grossMonthlyInputTokens,
+    monthlyOutputTokens,
+    monthlyCachedTokens,
+    monthlyTokenCost,
+    monthlyAiCost,
+    annualAiCost,
   };
-}
-
-function requiredAutomationForBreakEven(inputs) {
-  const {
-    teamSize,
-    salary,
-    burden,
-    attrition,
-    management,
-    aiPlatform,
-    aiUsage,
-    hitl,
-    implementation,
-    lift,
-    rework,
-    geoMultiplier,
-    maintenanceHours,
-    maintenanceRate,
-  } = inputs;
-  const baseMonthlyLabor = teamSize * salary * geoMultiplier;
-  const fullyLoadedMonthlyLabor =
-    baseMonthlyLabor * (1 + burden + attrition + management);
-  const annualEmployeeTco = fullyLoadedMonthlyLabor * 12;
-  const annualAiBase =
-    (aiPlatform + aiUsage + hitl + maintenanceHours * maintenanceRate) * 12 + implementation;
-  const laborCostWithoutAutomation =
-    (fullyLoadedMonthlyLabor * (1 + rework) * 12) / (1 + lift);
-
-  if (laborCostWithoutAutomation <= 0) {
-    return 1;
-  }
-
-  const ratio = (annualEmployeeTco - annualAiBase) / laborCostWithoutAutomation;
-  return clamp(1 - ratio, 0, 1);
 }
 
 function assignPreset(name) {
@@ -230,214 +191,94 @@ function assignPreset(name) {
 }
 
 function update() {
-  const teamSize = Math.max(1, safeNumber(fields.teamSize.value, 1));
-  const salary = Math.max(0, safeNumber(fields.salary.value));
-  const burden = clamp(safeNumber(fields.burden.value) / 100, 0, 2);
-  const attrition = clamp(safeNumber(fields.attrition.value) / 100, 0, 1);
-  const management = clamp(safeNumber(fields.management.value) / 100, 0, 1);
-  const aiPlatform = Math.max(0, safeNumber(fields.aiPlatform.value));
-  const aiUsage = Math.max(0, safeNumber(fields.aiUsage.value));
-  const hitl = Math.max(0, safeNumber(fields.hitl.value));
-  const implementation = Math.max(0, safeNumber(fields.implementation.value));
-  const automation = clamp(safeNumber(fields.automation.value) / 100, 0, 1);
-  const lift = clamp(safeNumber(fields.lift.value) / 100, 0, 1);
-  const rework = clamp(safeNumber(fields.rework.value) / 100, 0, 1);
-  const monthlyVolume = Math.max(1, safeNumber(fields.monthlyVolume.value, 1));
-  const minutesPerTask = Math.max(0.1, safeNumber(fields.minutesPerTask.value, 0.1));
-  const geoMultiplier = clamp(safeNumber(fields.geoMultiplier.value) / 100, 0.5, 2.5);
-  const maintenanceHours = Math.max(0, safeNumber(fields.maintenanceHours.value));
-  const maintenanceRate = Math.max(0, safeNumber(fields.maintenanceRate.value));
+  const inputs = {
+    model: fields.model.value,
+    monthlyUsers: Math.max(1, safeNumber(fields.monthlyUsers.value, 1)),
+    requestsPerUser: Math.max(1, safeNumber(fields.requestsPerUser.value, 1)),
+    inputTokens: Math.max(1, safeNumber(fields.inputTokens.value, 1)),
+    outputTokens: Math.max(1, safeNumber(fields.outputTokens.value, 1)),
+    cacheShare: clamp(safeNumber(fields.cacheShare.value) / 100, 0, 1),
+    overheadTokens: Math.max(0, safeNumber(fields.overheadTokens.value, 0)),
+    toolCalls: Math.max(0, safeNumber(fields.toolCalls.value, 0)),
+    tokensPerToolCall: Math.max(0, safeNumber(fields.tokensPerToolCall.value, 0)),
+    retryRate: clamp(safeNumber(fields.retryRate.value) / 100, 0, 1),
+    platformFee: Math.max(0, safeNumber(fields.platformFee.value, 0)),
+    reviewCost: Math.max(0, safeNumber(fields.reviewCost.value, 0)),
+    implementation: Math.max(0, safeNumber(fields.implementation.value, 0)),
+    humanMonthlyCost: Math.max(0, safeNumber(fields.humanMonthlyCost.value, 0)),
+    growthRate: clamp(safeNumber(fields.growthRate.value) / 100, 0, 3),
+  };
 
-  const effectiveHumanCapacityGain = (automation + (1 - automation) * lift) * (1 - rework) * 100;
-  const totalMinutes = monthlyVolume * minutesPerTask;
-  const annualHoursReclaimed =
-    ((totalMinutes * 12) / 60) * clamp((automation + (1 - automation) * lift) * (1 - rework), 0, 1);
+  const base = estimateAnnualCost(inputs, 1);
+  const conservative = estimateAnnualCost(
+    {
+      ...inputs,
+      retryRate: clamp(inputs.retryRate * 1.2, 0, 1),
+      cacheShare: clamp(inputs.cacheShare * 0.8, 0, 1),
+    },
+    0.9
+  );
+  const growth = estimateAnnualCost(
+    {
+      ...inputs,
+      retryRate: clamp(inputs.retryRate * 1.1, 0, 1),
+      cacheShare: clamp(inputs.cacheShare * 0.9, 0, 1),
+    },
+    1 + inputs.growthRate
+  );
 
-  const base = calculateAnnualSavings({
-    teamSize,
-    salary,
-    burden,
-    attrition,
-    management,
-    aiPlatform,
-    aiUsage,
-    hitl,
-    implementation,
-    automation,
-    lift,
-    rework,
-    geoMultiplier,
-    maintenanceHours,
-    maintenanceRate,
-  });
+  const annualHumanCost = inputs.humanMonthlyCost * 12;
+  const annualSavings = annualHumanCost - base.annualAiCost;
+  const paybackMonths =
+    annualSavings > 0 ? inputs.implementation / ((annualSavings + inputs.implementation) / 12) : null;
 
-  const annualEmployeeTco = base.annualEmployeeTco;
-  const aiProgramWithResidualLabor = base.aiProgramWithResidualLabor;
-  const annualSavings = base.annualSavings;
-
-  const monthlySavings =
-    base.fullyLoadedMonthlyLabor - (base.monthlyAiProgram + base.adjustedAiEquivalentLaborCost);
-  const paybackMonths = monthlySavings > 0 ? implementation / monthlySavings : null;
-  const breakEvenMonths = paybackMonths !== null ? Math.ceil(paybackMonths) : null;
-  const yearOneRoi = aiProgramWithResidualLabor > 0 ? (annualSavings / aiProgramWithResidualLabor) * 100 : 0;
-  const threeYearBenefit = annualSavings * 3;
-  const yearTwoSavings = annualEmployeeTco - (aiProgramWithResidualLabor - implementation);
-
-  const conservative = calculateAnnualSavings({
-    teamSize,
-    salary,
-    burden,
-    attrition,
-    management,
-    aiPlatform,
-    aiUsage: aiUsage * 1.15,
-    hitl,
-    implementation,
-    automation: clamp(automation * 0.85, 0, 1),
-    lift: clamp(lift * 0.9, 0, 1),
-    rework: clamp(rework * 1.25, 0, 1),
-    geoMultiplier,
-    maintenanceHours,
-    maintenanceRate,
-  });
-
-  const upside = calculateAnnualSavings({
-    teamSize,
-    salary,
-    burden,
-    attrition,
-    management,
-    aiPlatform,
-    aiUsage: aiUsage * 0.9,
-    hitl,
-    implementation,
-    automation: clamp(automation * 1.1, 0, 1),
-    lift: clamp(lift * 1.15, 0, 1),
-    rework: clamp(rework * 0.8, 0, 1),
-    geoMultiplier,
-    maintenanceHours,
-    maintenanceRate,
-  });
-
-  const maxAffordableAiMonthly =
-    base.fullyLoadedMonthlyLabor - base.adjustedAiEquivalentLaborCost + implementation / 12;
-  const humanCostPerTask = base.fullyLoadedMonthlyLabor / monthlyVolume;
-  const aiCostPerTask =
-    (base.monthlyAiProgram + base.adjustedAiEquivalentLaborCost) / monthlyVolume;
-  const aiCostPerMinute = aiCostPerTask / minutesPerTask;
-  const capacityValue = (annualHoursReclaimed / (teamSize * 12)) * base.fullyLoadedMonthlyLabor;
-  const breakEvenVolume =
-    humanCostPerTask > aiCostPerTask ? implementation / (humanCostPerTask - aiCostPerTask) : null;
-  const requiredAutomation = requiredAutomationForBreakEven({
-    teamSize,
-    salary,
-    burden,
-    attrition,
-    management,
-    aiPlatform,
-    aiUsage,
-    hitl,
-    implementation,
-    lift,
-    rework,
-    geoMultiplier,
-    maintenanceHours,
-    maintenanceRate,
-  });
-
-  let confidenceScore = 55;
-  if (annualSavings > 0) confidenceScore += 15;
-  if (conservative.annualSavings > 0) confidenceScore += 10;
-  if (paybackMonths !== null && paybackMonths <= 12) confidenceScore += 10;
-  if (paybackMonths !== null && paybackMonths <= 6) confidenceScore += 5;
-  if (rework <= 0.1) confidenceScore += 5;
-  if (automation >= 0.6) confidenceScore += 5;
-  if (annualSavings < 0) confidenceScore -= 20;
-  if (conservative.annualSavings < 0) confidenceScore -= 10;
-  confidenceScore = clamp(confidenceScore, 0, 100);
-
-  let riskFlag = "Stable";
-  if (conservative.annualSavings < 0 || paybackMonths === null) {
-    riskFlag = "High";
-  } else if (paybackMonths > 12 || confidenceScore < 60) {
-    riskFlag = "Medium";
-  }
-
-  outputs.employeeAnnual.textContent = money(annualEmployeeTco);
-  outputs.aiAnnual.textContent = money(aiProgramWithResidualLabor);
+  outputs.monthlyRequests.textContent = Math.round(base.monthlyRequests).toLocaleString("en-US");
+  outputs.monthlyTokenCost.textContent = money(base.monthlyTokenCost);
+  outputs.monthlyAiCost.textContent = money(base.monthlyAiCost);
+  outputs.annualAiCost.textContent = money(base.annualAiCost);
+  outputs.costPerRequest.textContent = moneyPrecise(base.monthlyAiCost / Math.max(1, base.monthlyRequests));
+  outputs.costPerUser.textContent = moneyPrecise(base.monthlyAiCost / inputs.monthlyUsers);
   outputs.annualSavings.textContent = money(annualSavings);
-  outputs.payback.textContent = paybackMonths !== null ? `${paybackMonths.toFixed(1)} months` : "No payback";
-  outputs.breakEven.textContent = breakEvenMonths !== null ? `Month ${breakEvenMonths}` : "Not reached";
-  outputs.roi.textContent = `${yearOneRoi.toFixed(0)}%`;
-  outputs.capacity.textContent = `${Math.max(0, effectiveHumanCapacityGain).toFixed(0)}%`;
-  outputs.monthlySavings.textContent = money(monthlySavings);
-  outputs.threeYearBenefit.textContent = money(threeYearBenefit);
+  outputs.conservativeAnnual.textContent = money(conservative.annualAiCost);
+  outputs.baseAnnual.textContent = money(base.annualAiCost);
+  outputs.growthAnnual.textContent = money(growth.annualAiCost);
 
-  outputs.conservativeSavings.textContent = money(conservative.annualSavings);
-  outputs.baseSavings.textContent = money(annualSavings);
-  outputs.upsideSavings.textContent = money(upside.annualSavings);
-  outputs.confidenceScore.textContent = `${confidenceScore.toFixed(0)}/100`;
-  outputs.requiredAutomation.textContent = `${(requiredAutomation * 100).toFixed(0)}%`;
-  outputs.maxAiMonthly.textContent = money(Math.max(0, maxAffordableAiMonthly));
-  outputs.riskFlag.textContent = riskFlag;
-  outputs.breakEvenVolume.textContent =
-    breakEvenVolume !== null ? `${Math.ceil(breakEvenVolume).toLocaleString("en-US")}` : "Not reached";
-  outputs.humanCostPerTask.textContent = moneyPrecise(humanCostPerTask);
-  outputs.aiCostPerTask.textContent = moneyPrecise(aiCostPerTask);
-  outputs.aiCostPerMinute.textContent = moneyPrecise(aiCostPerMinute);
-  outputs.yearTwoSavings.textContent = money(yearTwoSavings);
-  outputs.hoursReclaimed.textContent = `${Math.round(annualHoursReclaimed).toLocaleString("en-US")} hrs`;
-  outputs.capacityValue.textContent = money(capacityValue);
+  outputs.monthlyInputTokens.textContent = Math.round(base.grossMonthlyInputTokens).toLocaleString("en-US");
+  outputs.monthlyOutputTokens.textContent = Math.round(base.monthlyOutputTokens).toLocaleString("en-US");
+  outputs.monthlyCachedTokens.textContent = Math.round(base.monthlyCachedTokens).toLocaleString("en-US");
+  outputs.payback.textContent = paybackMonths !== null ? `${paybackMonths.toFixed(1)} months` : "No payback";
 
   outputs.annualSavings.classList.toggle("positive", annualSavings >= 0);
   outputs.annualSavings.classList.toggle("negative", annualSavings < 0);
-  outputs.monthlySavings.classList.toggle("positive", monthlySavings >= 0);
-  outputs.monthlySavings.classList.toggle("negative", monthlySavings < 0);
-  outputs.threeYearBenefit.classList.toggle("positive", threeYearBenefit >= 0);
-  outputs.threeYearBenefit.classList.toggle("negative", threeYearBenefit < 0);
-  outputs.riskFlag.classList.toggle("positive", riskFlag === "Stable");
-  outputs.riskFlag.classList.toggle("negative", riskFlag === "High");
 
-  const max = Math.max(annualEmployeeTco, aiProgramWithResidualLabor, Math.abs(annualSavings), 1);
-  outputs.employeeBar.style.width = `${(annualEmployeeTco / max) * 100}%`;
-  outputs.aiBar.style.width = `${(aiProgramWithResidualLabor / max) * 100}%`;
+  const max = Math.max(annualHumanCost, base.annualAiCost, Math.abs(annualSavings), 1);
+  outputs.humanBar.style.width = `${(annualHumanCost / max) * 100}%`;
+  outputs.aiBar.style.width = `${(base.annualAiCost / max) * 100}%`;
   outputs.savingsBar.style.width = `${(Math.abs(annualSavings) / max) * 100}%`;
 
   if (annualSavings >= 0) {
-    outputs.insight.textContent = `AI-led delivery saves ${money(annualSavings)} annually (${money(monthlySavings)} per month), reaches break-even ${outputs.breakEven.textContent.toLowerCase()}, and delivers ${yearOneRoi.toFixed(0)}% Year-1 ROI. Unit economics improve from ${moneyPrecise(humanCostPerTask)} to ${moneyPrecise(aiCostPerTask)} per task with AI cost around ${moneyPrecise(aiCostPerMinute)} per minute. Confidence score: ${confidenceScore.toFixed(0)}/100.`;
+    outputs.insight.textContent = `Base case: ${money(base.annualAiCost)} annual AI cost vs ${money(
+      annualHumanCost
+    )} human cost, saving ${money(annualSavings)} per year. Cost per request is ${moneyPrecise(
+      base.monthlyAiCost / Math.max(1, base.monthlyRequests)
+    )}.`;
   } else {
-    outputs.insight.textContent = `Current assumptions show a ${money(Math.abs(annualSavings))} annual gap. Improve automation suitability to at least ${outputs.requiredAutomation.textContent}, reduce rework, or lower AI stack costs before rollout.`;
-  }
-
-  if (annualSavings > 0 && paybackMonths !== null && paybackMonths <= 12) {
-    outputs.recommendationHeadline.textContent = "Proceed with phased rollout.";
-    outputs.recommendationBody.textContent =
-      `Base case indicates ${money(annualSavings)} Year-1 savings and ${money(yearTwoSavings)} recurring annual savings after implementation costs roll off. Prioritize one department preset and run a 90-day pilot with weekly QA tracking.`;
-    outputs.executionPlan.textContent =
-      "Execution path: 30-day workflow baseline, 60-day pilot on one use case, then stage-gate expansion only if quality SLA and cost per task targets are met.";
-  } else if (annualSavings > 0) {
-    outputs.recommendationHeadline.textContent = "Proceed with pilot before full rollout.";
-    outputs.recommendationBody.textContent =
-      "The model is positive but payback extends beyond one year. Tighten AI usage costs and improve automation suitability to reduce time-to-value before broad deployment.";
-    outputs.executionPlan.textContent =
-      "Execution path: hold full deployment, renegotiate platform/usage pricing, and rerun this model after 4 weeks of pilot telemetry.";
-  } else {
-    outputs.recommendationHeadline.textContent = "Do not scale yet.";
-    outputs.recommendationBody.textContent =
-      "Current assumptions do not support an immediate rollout. Re-baseline vendor costs, reduce quality penalty, and target higher-volume workflows before budget approval.";
-    outputs.executionPlan.textContent =
-      "Execution path: run a vendor reset + process redesign sprint, then revisit when automation suitability and rework assumptions materially improve.";
+    outputs.insight.textContent = `Current configuration costs ${money(
+      Math.abs(annualSavings)
+    )} more annually than the human baseline. Improve cache share, lower output length, or switch to lower-cost model tier.`;
   }
 }
 
+fillModelSelect();
+assignPreset("chatbot");
+
 Object.values(fields).forEach((field) => {
   field.addEventListener("input", update);
+  field.addEventListener("change", update);
 });
 
 document.querySelectorAll(".preset").forEach((button) => {
-  button.addEventListener("click", () => {
-    assignPreset(button.dataset.preset);
-  });
+  button.addEventListener("click", () => assignPreset(button.dataset.preset));
 });
 
 update();

@@ -141,6 +141,14 @@ input {
   padding: 10px;
 }
 
+select {
+  font: inherit;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  padding: 10px;
+  background: #fff;
+}
+
 .metrics {
   display: grid;
   gap: 12px;
