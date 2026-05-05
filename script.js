@@ -40,8 +40,11 @@ const outputs = {
   aiCostPerTask: document.getElementById("aiCostPerTask"),
   aiCostPerMinute: document.getElementById("aiCostPerMinute"),
   yearTwoSavings: document.getElementById("yearTwoSavings"),
+  hoursReclaimed: document.getElementById("hoursReclaimed"),
+  capacityValue: document.getElementById("capacityValue"),
   recommendationHeadline: document.getElementById("recommendationHeadline"),
   recommendationBody: document.getElementById("recommendationBody"),
+  executionPlan: document.getElementById("executionPlan"),
   employeeBar: document.getElementById("employeeBar"),
   aiBar: document.getElementById("aiBar"),
   savingsBar: document.getElementById("savingsBar"),
@@ -246,6 +249,9 @@ function update() {
   const maintenanceRate = Math.max(0, safeNumber(fields.maintenanceRate.value));
 
   const effectiveHumanCapacityGain = (automation + (1 - automation) * lift) * (1 - rework) * 100;
+  const totalMinutes = monthlyVolume * minutesPerTask;
+  const annualHoursReclaimed =
+    ((totalMinutes * 12) / 60) * clamp((automation + (1 - automation) * lift) * (1 - rework), 0, 1);
 
   const base = calculateAnnualSavings({
     teamSize,
@@ -319,6 +325,7 @@ function update() {
   const aiCostPerTask =
     (base.monthlyAiProgram + base.adjustedAiEquivalentLaborCost) / monthlyVolume;
   const aiCostPerMinute = aiCostPerTask / minutesPerTask;
+  const capacityValue = (annualHoursReclaimed / (teamSize * 12)) * base.fullyLoadedMonthlyLabor;
   const breakEvenVolume =
     humanCostPerTask > aiCostPerTask ? implementation / (humanCostPerTask - aiCostPerTask) : null;
   const requiredAutomation = requiredAutomationForBreakEven({
@@ -379,6 +386,8 @@ function update() {
   outputs.aiCostPerTask.textContent = moneyPrecise(aiCostPerTask);
   outputs.aiCostPerMinute.textContent = moneyPrecise(aiCostPerMinute);
   outputs.yearTwoSavings.textContent = money(yearTwoSavings);
+  outputs.hoursReclaimed.textContent = `${Math.round(annualHoursReclaimed).toLocaleString("en-US")} hrs`;
+  outputs.capacityValue.textContent = money(capacityValue);
 
   outputs.annualSavings.classList.toggle("positive", annualSavings >= 0);
   outputs.annualSavings.classList.toggle("negative", annualSavings < 0);
@@ -404,14 +413,20 @@ function update() {
     outputs.recommendationHeadline.textContent = "Proceed with phased rollout.";
     outputs.recommendationBody.textContent =
       `Base case indicates ${money(annualSavings)} Year-1 savings and ${money(yearTwoSavings)} recurring annual savings after implementation costs roll off. Prioritize one department preset and run a 90-day pilot with weekly QA tracking.`;
+    outputs.executionPlan.textContent =
+      "Execution path: 30-day workflow baseline, 60-day pilot on one use case, then stage-gate expansion only if quality SLA and cost per task targets are met.";
   } else if (annualSavings > 0) {
     outputs.recommendationHeadline.textContent = "Proceed with pilot before full rollout.";
     outputs.recommendationBody.textContent =
       "The model is positive but payback extends beyond one year. Tighten AI usage costs and improve automation suitability to reduce time-to-value before broad deployment.";
+    outputs.executionPlan.textContent =
+      "Execution path: hold full deployment, renegotiate platform/usage pricing, and rerun this model after 4 weeks of pilot telemetry.";
   } else {
     outputs.recommendationHeadline.textContent = "Do not scale yet.";
     outputs.recommendationBody.textContent =
       "Current assumptions do not support an immediate rollout. Re-baseline vendor costs, reduce quality penalty, and target higher-volume workflows before budget approval.";
+    outputs.executionPlan.textContent =
+      "Execution path: run a vendor reset + process redesign sprint, then revisit when automation suitability and rework assumptions materially improve.";
   }
 }
 
