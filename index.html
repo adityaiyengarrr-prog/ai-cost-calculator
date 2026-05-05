@@ -21,7 +21,7 @@
       <section class="hero card">
         <p class="tag">Free • No Sign-up</p>
         <h1>AI Token Cost Calculator & Budget Planner</h1>
-        <p>Estimate true AI operating cost, ROI, and break-even in under 30 seconds.</p>
+        <p>Find your real monthly AI cost, cost per request, and savings vs legacy workflows.</p>
         <p class="hero-sub">Built for founders, product teams, and agency operators planning LLM margins.</p>
       </section>
 
@@ -42,15 +42,15 @@
             <select id="model"></select>
           </label>
           <label>
-            Input Tokens
+            Input Tokens / Request
             <input id="inputTokens" type="number" min="0" value="1500" step="1" />
           </label>
           <label>
-            Output Tokens
+            Output Tokens / Request
             <input id="outputTokens" type="number" min="0" value="600" step="1" />
           </label>
           <label>
-            Calls per Day
+            Requests per Day
             <input id="callsPerDay" type="number" min="0" value="200" step="1" />
           </label>
           <label>
@@ -74,15 +74,15 @@
         <p id="modelNotice" class="notice" aria-live="polite"></p>
 
         <div class="results" aria-label="Results">
-          <article><h3>Estimated Input Token Cost</h3><p id="inputCost">$0.00</p></article>
-          <article><h3>Estimated Output Token Cost</h3><p id="outputCost">$0.00</p></article>
-          <article><h3>Total Cost Per Call</h3><p id="costPerRun">$0.00</p></article>
-          <article><h3>Estimated Monthly Cost</h3><p id="monthlyCost">$0.00</p></article>
-          <article><h3>Estimated Yearly Cost</h3><p id="yearlyCost">$0.00</p></article>
-          <article><h3>Estimated Monthly Savings vs Traditional</h3><p id="monthlySavings">$0.00</p></article>
-          <article><h3>Estimated Annual Savings</h3><p id="annualSavings">$0.00</p></article>
+          <article><h3>Cost / Request</h3><p id="costPerRun">$0.00</p></article>
+          <article><h3>Monthly AI Cost</h3><p id="monthlyCost">$0.00</p></article>
+          <article><h3>Yearly AI Cost</h3><p id="yearlyCost">$0.00</p></article>
+          <article><h3>Monthly Savings</h3><p id="monthlySavings">$0.00</p></article>
+          <article><h3>Annual Savings</h3><p id="annualSavings">$0.00</p></article>
           <article><h3>Cost Reduction ROI</h3><p id="roiPercent">0.0%</p></article>
           <article><h3>Break-even on $500 Setup</h3><p id="breakEvenDays">0 days</p></article>
+          <article><h3>Projected Sell Price / Request</h3><p id="suggestedPrice">$0.00</p></article>
+          <article><h3>Equivalent FTE Cost / Year</h3><p id="fteEquivalent">$0.00</p></article>
         </div>
         <p id="volumeSummary" class="volume-summary" aria-live="polite"></p>
 
@@ -90,6 +90,24 @@
           Prices are estimates based on publicly available pricing and may change. Always verify
           with the provider before making business decisions.
         </p>
+      </section>
+
+      <section class="card split">
+        <article>
+          <h2>How This Formula Works</h2>
+          <ul>
+            <li>Token cost per request = input token rate + output token rate.</li>
+            <li>Monthly AI cost = requests/day × days/month × adjusted cost per request.</li>
+            <li>Savings and ROI compare AI monthly spend against your traditional monthly cost.</li>
+          </ul>
+        </article>
+        <article>
+          <h2>AI vs Traditional</h2>
+          <p>
+            Traditional workflows scale with labor hours; AI-heavy workflows scale with token usage.
+            This calculator helps teams forecast variable cost as usage grows.
+          </p>
+        </article>
       </section>
 
       <section class="card">
@@ -110,35 +128,17 @@
       </section>
 
       <section class="card">
-        <h2>Token Basics</h2>
+        <h2>Use Cases</h2>
         <ul>
-          <li>Input tokens are prompt/context tokens sent to the model.</li>
-          <li>Output tokens are generated response tokens from the model.</li>
-          <li>1,000 tokens is roughly 750 words in English for planning purposes.</li>
+          <li>Vibe coding and indie hacking tools</li>
+          <li>Support copilots and agent workflows</li>
+          <li>Content, research, and internal assistants</li>
         </ul>
-      </section>
-
-      <section class="card split">
-        <article>
-          <h2>AI vs Traditional</h2>
-          <p>
-            Traditional workflows scale with labor hours; AI-heavy workflows scale with token usage.
-            This calculator helps teams forecast variable cost as usage grows.
-          </p>
-        </article>
-        <article>
-          <h2>Use Cases</h2>
-          <ul>
-            <li>Vibe coding and indie hacking tools</li>
-            <li>Support copilots and agent workflows</li>
-            <li>Content, research, and internal assistants</li>
-          </ul>
-          <p class="internal-links">
-            Next reads: <a href="/blog/openai-vs-anthropic-token-cost-benchmarks">provider benchmarks</a>,
-            <a href="/blog/reduce-llm-spend-prompt-output-controls">spend reduction playbook</a>,
-            <a href="/blog/ai-token-pricing-2026-quarterly-update">latest pricing updates</a>.
-          </p>
-        </article>
+        <p class="internal-links">
+          Next reads: <a href="/blog/openai-vs-anthropic-token-cost-benchmarks">provider benchmarks</a>,
+          <a href="/blog/reduce-llm-spend-prompt-output-controls">spend reduction playbook</a>,
+          <a href="/blog/ai-token-pricing-2026-quarterly-update">latest pricing updates</a>.
+        </p>
       </section>
 
       <section class="card faq">
@@ -146,7 +146,7 @@
         <details>
           <summary>How do I calculate AI token costs?</summary>
           <p>
-            Multiply your input tokens and output tokens by each model rate, then multiply by call
+            Multiply your input tokens and output tokens by each model rate, then multiply by request
             volume. This calculator automates that formula.
           </p>
         </details>
@@ -158,15 +158,15 @@
           </p>
         </details>
         <details>
-          <summary>Is this an exact invoice prediction?</summary>
-          <p>No. It is a directional estimate and should be validated against provider billing.</p>
+          <summary>What is a good margin target for AI products?</summary>
+          <p>
+            Many teams start with a 15% to 40% margin over direct model + operations cost and adjust
+            based on support and infrastructure realities.
+          </p>
         </details>
         <details>
-          <summary>Why are some models marked for verification?</summary>
-          <p>
-            Some providers/models did not have a clear public token price at implementation time.
-            Those entries are intentionally flagged instead of guessed.
-          </p>
+          <summary>Is this an exact invoice prediction?</summary>
+          <p>No. It is a directional estimate and should be validated against provider billing.</p>
         </details>
       </section>
 
@@ -205,7 +205,7 @@
             "name": "How do I calculate AI token costs?",
             "acceptedAnswer": {
               "@type": "Answer",
-              "text": "Multiply input and output tokens by each model's per-million token rates, then multiply by total call volume."
+              "text": "Multiply input and output tokens by each model's per-million token rates, then multiply by total request volume."
             }
           },
           {
@@ -218,10 +218,18 @@
           },
           {
             "@type": "Question",
+            "name": "What is a good margin target for AI products?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Many teams start with a 15% to 40% margin over direct model and operations cost, then adjust by support and infrastructure needs."
+            }
+          },
+          {
+            "@type": "Question",
             "name": "Is this an exact invoice prediction?",
             "acceptedAnswer": {
               "@type": "Answer",
-              "text": "No. It is an estimate and should be validated against provider billing."
+              "text": "No. It is a directional estimate and should be validated against provider billing."
             }
           }
         ]
